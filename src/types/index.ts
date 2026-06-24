@@ -1,0 +1,551 @@
+// ============================================================
+// NEXORA — Complete Type Definitions
+// ============================================================
+
+export type ProductStatus = 'draft' | 'active' | 'hidden' | 'archived' | 'sold_out';
+export type ProductVisibility = 'public' | 'private' | 'scheduled';
+
+
+export interface ProductVariant {
+  id?: string;
+  productId: string;
+  size: string;
+  color: string;
+  sku?: string;
+  stock: number;
+  reservedStock?: number;
+  lowStockThreshold: number;
+  imageUrl?: string;
+  sizeLabel?: string;
+  weightRange?: string;
+  barcode?: string;
+  status: 'active' | 'disabled' | 'hidden' | 'sold_out' | 'archived';
+  sortOrder?: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface ProductColor {
+  id: string;
+  name: string;
+  nameEn?: string;
+  nameAr?: string;
+  hex?: string;
+  pattern?: string;
+  available?: boolean;
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  shortDescription?: string;
+  price: number;
+  compareAtPrice?: number;
+  costPrice?: number;
+  category: 'men' | 'women' | 'unisex';
+  gender?: 'men' | 'women' | 'unisex';
+  collection: string;
+  dropId?: string;
+  images: string[];
+  thumbnail?: string;
+  sizes: SizeInventory[];
+  colors: Array<string | ProductColor>;
+  materials: string[];
+  fit?: string;
+  careInstructions?: string;
+  sku: string;
+  tags: string[];
+  status?: ProductStatus;
+  visibility?: ProductVisibility;
+  badges?: string[];
+  isFeatured: boolean;
+  isNewArrival: boolean;
+  isBestSeller: boolean;
+  isLimitedDrop: boolean;
+  rating: number;
+  reviewCount: number;
+  seoTitle: string;
+  seoDescription: string;
+  createdAt: Date;
+  updatedAt: Date;
+  createdBy?: string;
+  updatedBy?: string;
+}
+
+export interface SizeInventory {
+  size: string;
+  stock: number;
+  lowStockThreshold: number;
+}
+
+export interface CartItem {
+  productId: string;
+  variantId?: string;
+  slug: string;
+  name: string;
+  price: number;
+  size: string;
+  color?: string;
+  colorHex?: string;
+  colorPattern?: string;
+  quantity: number;
+  image: string;
+  sizeLabel?: string;
+  weightRange?: string;
+  lineTotal?: number;
+  productSnapshot?: Record<string, unknown>;
+}
+
+
+export interface Order {
+  id: string;
+  orderNumber: string;
+  customer: CustomerInfo;
+  items: OrderItem[];
+  subtotal: number;
+  shippingFee: number;
+  discount: number;
+  couponCode?: string;
+  total: number;
+  paymentMethod: 'cod' | 'instapay' | 'vodafone_cash' | 'valu';
+  paymentStatus: 'pending' | 'pending_confirmation' | 'waiting_transfer' | 'paid' | 'collected' | 'failed' | 'refunded';
+  status: OrderStatus;
+  trackingUpdates: TrackingUpdate[];
+  adminNotes?: string;
+  customerNotes?: string;
+  source?: string;
+  codFee?: number;
+  deliveryEstimate?: string;
+  shippingProvider?: string;
+  shippingStatus?: string;
+  trackingNumber?: string;
+  shipmentId?: string;
+  shippingQuote?: Record<string, unknown>;
+  paymentReference?: string;
+  paymentNotes?: string;
+  paymentConfirmationPhone?: string;
+  followupStatus?: string;
+  followups?: OrderFollowup[];
+  events?: OrderFollowup[];
+  invoiceSnapshot?: Record<string, unknown>;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CustomerInfo {
+  fullName: string;
+  phone: string;
+  email?: string;
+  governorate: string;
+  city: string;
+  address: string;
+  notes?: string;
+}
+
+export interface OrderFollowup {
+  id: string;
+  orderId: string;
+  type: 'whatsapp_sent' | 'reminder_sent' | 'called' | 'no_answer' | 'confirmed' | 'cancelled' | 'payment_received' | 'note' | 'order_created' | string;
+  note?: string;
+  createdBy?: string;
+  createdAt: Date;
+}
+
+export interface OrderItem {
+  productId: string;
+  variantId?: string;
+  name: string;
+  slug: string;
+  price: number;
+  size: string;
+  color?: string;
+  colorHex?: string;
+  quantity: number;
+  image: string;
+  sizeLabel?: string;
+  weightRange?: string;
+  lineTotal?: number;
+  productSnapshot?: Record<string, unknown>;
+}
+
+export type OrderStatus = 'pending' | 'confirmed' | 'preparing' | 'packed' | 'shipped' | 'out_for_delivery' | 'delivered' | 'cancelled' | 'returned' | 'failed';
+
+export interface TrackingUpdate {
+  status: OrderStatus;
+  message: string;
+  timestamp: Date;
+  updatedBy?: string;
+}
+
+export interface Review {
+  id: string;
+  reviewType?: 'product' | 'site';
+  productId: string;
+  productName: string;
+  customerName: string;
+  customerPhone?: string;
+  rating: number;
+  title: string;
+  body: string;
+  images?: string[];
+  adminReply?: string;
+  status?: 'pending' | 'published' | 'rejected' | 'hidden' | 'archived';
+  isApproved: boolean;
+  isFeatured: boolean;
+  helpfulCount: number;
+  createdAt: Date;
+  updatedAt?: Date;
+  approvedAt?: Date;
+}
+
+export interface WorkflowStatusConfig {
+  id?: string;
+  key: string;
+  label: string;
+  description?: string;
+  color?: string;
+  sortOrder: number;
+  isActive: boolean;
+  isDefault?: boolean;
+  isFinal?: boolean;
+  nextStatusKey?: string | null;
+}
+
+export interface FollowupTypeConfig {
+  id?: string;
+  key: string;
+  label: string;
+  description?: string;
+  color?: string;
+  icon?: string;
+  sortOrder: number;
+  isActive: boolean;
+  isQuickAction: boolean;
+  templateText?: string;
+}
+
+export type DiscountType = 'percentage' | 'fixed' | 'free_shipping';
+export type CampaignStatus = 'draft' | 'scheduled' | 'active' | 'paused' | 'expired' | 'ended' | 'archived';
+
+export interface Coupon {
+  id: string;
+  code: string;
+  title?: string;
+  description?: string;
+  type: DiscountType;
+  value: number;
+  minOrderAmount: number;
+  maxDiscountAmount?: number;
+  usageLimit: number;
+  usedCount: number;
+  perCustomerLimit?: number;
+  startDate: Date;
+  endDate: Date;
+  isActive: boolean;
+  status?: CampaignStatus;
+  allowedProductIds?: string[];
+  excludedProductIds?: string[];
+  allowedCategories?: string[];
+  excludedCategories?: string[];
+  allowedCollections?: string[];
+  excludedCollections?: string[];
+  firstOrderOnly?: boolean;
+  createdAt: Date;
+  updatedAt?: Date;
+}
+
+export interface Promotion {
+  id: string;
+  title: string;
+  subtitle?: string;
+  type: 'storewide' | 'category' | 'collection' | 'drop' | 'product' | 'free_shipping';
+  discountType: DiscountType;
+  discountValue: number;
+  targetIds: string[];
+  status: CampaignStatus;
+  startDate: Date;
+  endDate: Date;
+  bannerText?: string;
+  showOnHome: boolean;
+  showOnProduct: boolean;
+  showOnCart: boolean;
+  showCountdown: boolean;
+  createdAt: Date;
+  updatedAt?: Date;
+}
+
+export interface Drop {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  heroImage: string;
+  status: 'draft' | 'scheduled' | 'live' | 'ended' | 'archived';
+  launchDate: Date;
+  endDate?: Date;
+  productIds: string[];
+  isLimited: boolean;
+  showCountdown: boolean;
+  seoTitle?: string;
+  seoDescription?: string;
+  createdAt: Date;
+  updatedAt?: Date;
+}
+
+export interface InventoryLog {
+  id: string;
+  productId: string;
+  sku?: string;
+  size: string;
+  change: number;
+  reason: 'manual_adjustment' | 'new_stock' | 'order_created' | 'order_cancelled' | 'return_received' | 'damaged' | 'lost';
+  previousStock: number;
+  newStock: number;
+  orderId?: string;
+  adminId?: string;
+  note?: string;
+  createdAt: Date;
+}
+
+export interface AuditLog {
+  id: string;
+  adminId?: string;
+  adminEmail?: string;
+  action: string;
+  entityType: string;
+  entityId: string;
+  before?: unknown;
+  after?: unknown;
+  createdAt: Date;
+}
+
+export interface NewsletterSubscriber {
+  id: string;
+  email: string;
+  subscribedAt: Date;
+  isActive: boolean;
+}
+
+export interface ContactMessage {
+  id: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  isRead: boolean;
+  createdAt: Date;
+}
+
+export interface Announcement {
+  id: string;
+  text: string;
+  link?: string;
+  isActive: boolean;
+  startDate: Date;
+  endDate: Date;
+}
+
+
+export interface LaunchSettings {
+  enabled?: boolean;
+  launchAt?: string;
+  timezone?: string;
+  autoOpen?: boolean;
+  title?: string;
+  subtitle?: string;
+  eyebrow?: string;
+  announcement?: string;
+  buttonText?: string;
+  whatsappMessage?: string;
+  backgroundImage?: string;
+  showCountdown?: boolean;
+  showNotifyForm?: boolean;
+  showSocialLinks?: boolean;
+  allowAdminBypass?: boolean;
+  notifySuccessMessage?: string;
+}
+
+export interface LaunchSubscriber {
+  id: string;
+  name?: string;
+  contact: string;
+  email?: string;
+  phone?: string;
+  source: string;
+  status: 'active' | 'contacted' | 'archived' | 'blocked' | string;
+  metadata?: Record<string, unknown>;
+  createdAt: Date;
+  updatedAt?: Date;
+}
+
+export interface SiteSettings {
+  id: string;
+  storeName: string;
+  logo: string;
+  favicon: string;
+  primaryColor: string;
+  accentColor: string;
+  currency: string;
+  shippingFee: number;
+  freeShippingThreshold: number;
+  taxRate: number;
+  whatsappNumber: string;
+  supportEmail?: string;
+  codEnabled?: boolean;
+  onlinePaymentEnabled?: boolean;
+  maintenanceMode?: boolean;
+  launchSettings?: LaunchSettings;
+  defaultLanguage?: 'en' | 'ar';
+  defaultTheme?: 'dark' | 'light' | 'system';
+  socialLinks: { instagram?: string; facebook?: string; twitter?: string; tiktok?: string; whatsapp?: string; };
+  paymentSettings?: {
+    codEnabled?: boolean;
+    instapayEnabled?: boolean;
+    vodafoneCashEnabled?: boolean;
+    valuEnabled?: boolean;
+    transferNumber?: string;
+    confirmationPhone?: string;
+    whatsappConfirmationNumber?: string;
+    instapayContact?: string;
+    vodafoneCashNumber?: string;
+    codFeeEnabled?: boolean;
+    codFeeAmount?: number;
+    requireScreenshotInstapay?: boolean;
+    requireScreenshotVodafone?: boolean;
+    screenshotRequired?: boolean;
+    instructions?: string;
+    codInstructionsAr?: string;
+    instapayInstructions?: string;
+    instapayInstructionsAr?: string;
+    vodafoneCashInstructions?: string;
+    vodafoneInstructionsAr?: string;
+    valuInstructions?: string;
+    valuInstructionsAr?: string;
+    metaPixelEnabled?: boolean;
+    metaPixelId?: string;
+  };
+  metaPixelEnabled?: boolean;
+  metaPixelId?: string;
+  returnPolicyText?: string;
+  shippingPolicyText?: string;
+  seo: { title: string; description: string; keywords: string; };
+  announcements: Announcement[];
+  updatedAt: Date;
+}
+
+export interface Admin {
+  uid: string;
+  email: string;
+  displayName: string;
+  role: 'owner' | 'superadmin' | 'admin' | 'manager' | 'orders_manager' | 'inventory_manager' | 'content_manager' | 'viewer';
+  permissions?: string[];
+  createdAt: Date;
+  lastLoginAt: Date;
+}
+
+export interface FilterState {
+  search: string;
+  category: string;
+  sizes: string[];
+  colors: Array<string | ProductColor>;
+  minPrice: number;
+  maxPrice: number;
+  sortBy: 'newest' | 'price-low' | 'price-high' | 'best-selling' | 'rating';
+}
+
+export interface DashboardStats {
+  totalRevenue: number;
+  totalOrders: number;
+  totalProducts: number;
+  totalCustomers: number;
+  pendingOrders: number;
+  lowStockProducts: number;
+  recentOrders: Order[];
+  salesChart: { date: string; amount: number }[];
+}
+
+export interface EgyptianGovernorate { name: string; cities: string[]; }
+
+export interface VisitorProfile {
+  id?: string;
+  anonymousId: string;
+  firstSeenAt?: Date;
+  lastSeenAt?: Date;
+  firstSource?: string;
+  firstMedium?: string;
+  firstCampaign?: string;
+  lastSource?: string;
+  lastMedium?: string;
+  lastCampaign?: string;
+  firstLandingPage?: string;
+  lastPage?: string;
+  deviceType?: string;
+  browser?: string;
+  os?: string;
+  country?: string;
+  city?: string;
+  isKnown?: boolean;
+  leadId?: string;
+  customerId?: string;
+  eventCount?: number;
+}
+
+export interface VisitorEvent {
+  id?: string;
+  visitorId?: string;
+  anonymousId?: string;
+  sessionId?: string;
+  eventName: string;
+  pageUrl?: string;
+  productId?: string;
+  cartValue?: number;
+  source?: string;
+  medium?: string;
+  campaign?: string;
+  content?: string;
+  metadata?: Record<string, unknown>;
+  createdAt?: Date;
+}
+
+export interface LeadProfile {
+  id?: string;
+  visitorId?: string;
+  name?: string;
+  phone?: string;
+  email?: string;
+  source?: string;
+  medium?: string;
+  campaign?: string;
+  interestProductId?: string;
+  interestProductName?: string;
+  status: 'new' | 'contacted' | 'interested' | 'ordered' | 'no_response' | 'not_interested' | 'checkout_abandoned';
+  notes?: string;
+  lastContactedAt?: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface CampaignLink {
+  id?: string;
+  name: string;
+  platform: 'facebook' | 'instagram' | 'tiktok' | 'google' | 'direct' | 'other';
+  source: string;
+  medium: string;
+  campaign: string;
+  content?: string;
+  landingPage: string;
+  finalUrl: string;
+  createdAt?: Date;
+}
+
+export interface GrowthDashboard {
+  visitorsToday: number;
+  leadsToday: number;
+  whatsappClicksToday: number;
+  topSources: Array<{ source: string; count: number }>;
+  topCampaigns: Array<{ campaign: string; visitors: number; leads: number; orders: number; revenue: number }>;
+  recentLeads: LeadProfile[];
+  recentVisitors: VisitorProfile[];
+}
