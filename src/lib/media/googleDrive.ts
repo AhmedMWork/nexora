@@ -1,5 +1,5 @@
 // ============================================================
-// NEXORA V3.3 — Google Drive Image URL Helpers
+// NEXORA — Google Drive Image URL Helpers
 // Supports public Drive links pasted by the admin.
 // ============================================================
 

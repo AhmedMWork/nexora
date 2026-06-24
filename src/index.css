@@ -489,7 +489,7 @@ html.dark .v34-logo-img { filter: brightness(1.14) contrast(1.08) drop-shadow(0 
   .studio-chip[data-active="true"] { border-color: #D7B98E !important; background: rgba(215,185,142,.14) !important; color: #F5F1EA !important; }
 }
 
-/* NEXORA V5.5.1 — Light Admin Polish + visual noise cleanup */
+/* NEXORA — Light Admin Polish + visual noise cleanup */
 @layer components {
   .nexora-admin-light {
     --admin-bg: #F8F0E4;
@@ -619,7 +619,7 @@ html.dark .v34-logo-img { filter: brightness(1.14) contrast(1.08) drop-shadow(0 
   }
 }
 
-/* NEXORA V5.5.3 — Clean Light Admin Reset
+/* NEXORA — Clean Light Admin Reset
    Strong owner-facing light UI pass. Existing technical pages remain available,
    but dark command-center colors are neutralized inside the admin shell. */
 @layer components {
@@ -826,5 +826,82 @@ html.dark .v34-logo-img { filter: brightness(1.14) contrast(1.08) drop-shadow(0 
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* NEXORA — Mobile-first admin and storefront refinements */
+@layer components {
+  @media (max-width: 639px) {
+    .admin-ux-reset {
+      background: linear-gradient(180deg, #FFFDF8 0%, #F8F0E4 56%, #F1E5D6 100%) !important;
+    }
+
+    .admin-ux-reset [class*="rounded-[32px]"],
+    .admin-ux-reset [class*="rounded-[30px]"],
+    .admin-ux-reset [class*="rounded-[28px]"] {
+      border-radius: 22px !important;
+    }
+
+    .admin-ux-reset [class*="p-7"],
+    .admin-ux-reset [class*="p-6"],
+    .admin-ux-reset [class*="p-5"] {
+      padding: 1rem !important;
+    }
+
+    .admin-ux-reset h1 {
+      font-size: clamp(1.65rem, 8vw, 2.4rem) !important;
+      line-height: 0.98 !important;
+      letter-spacing: -0.055em !important;
+    }
+
+    .admin-ux-reset h2 {
+      font-size: 1rem !important;
+    }
+
+    .admin-ux-reset .recharts-wrapper,
+    .admin-ux-reset .recharts-responsive-container {
+      min-height: 220px !important;
+    }
+
+    .admin-ux-reset table {
+      font-size: .78rem !important;
+    }
+
+    .admin-ux-reset .overflow-x-auto {
+      margin-left: -0.15rem;
+      margin-right: -0.15rem;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      border-radius: 20px !important;
+    }
+
+    .nexora-button,
+    .nexora-button-primary,
+    .v3-btn-primary,
+    .v3-btn-secondary {
+      min-height: 2.85rem;
+      width: 100%;
+      padding: .8rem 1rem;
+      font-size: .68rem;
+      letter-spacing: .13em;
+    }
+
+    .v3-product-card {
+      border-radius: 18px !important;
+      overflow: hidden;
+    }
+
+    .v3-product-card .v3-product-media {
+      aspect-ratio: 4 / 5;
+    }
+
+    .v3-product-card h3 {
+      font-size: .78rem !important;
+      line-height: 1.35 !important;
+    }
+
+    .v3-product-card [class*="p-4"] {
+      padding: .75rem !important;
+    }
   }
 }

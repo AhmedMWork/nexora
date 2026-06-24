@@ -33,26 +33,26 @@ function Field({ label, example, children }: { label: string; example: string; c
 
 function PreviewCard({ launch, mode }: { launch: NormalizedLaunchSettings; mode: PreviewMode }) {
   return (
-    <div className={`mx-auto overflow-hidden rounded-[34px] border border-[#D6B58F]/30 bg-[#0B0908] p-4 text-[#FFF8EC] shadow-[0_28px_80px_rgba(43,33,29,.22)] ${mode === 'mobile' ? 'max-w-[360px]' : 'max-w-full'}`}>
-      <div className="relative overflow-hidden rounded-[26px] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(214,181,143,.28),transparent_42%),linear-gradient(135deg,#171210,#050403)] p-5">
-        <div className="mb-8 flex items-center justify-between gap-3">
-          <img src="/assets/nexora-logo-ivory.png" alt="NEXORA" className="h-8 w-auto" />
-          <span className="rounded-full border border-[#D6B58F]/30 px-3 py-1 text-[9px] font-black uppercase tracking-[0.18em] text-[#D6B58F]">Preview</span>
+    <div className={`mx-auto overflow-hidden rounded-[34px] border border-[#D6B58F]/40 bg-[#F8F0E4] p-3 text-[#231916] shadow-[0_28px_80px_rgba(43,33,29,.13)] ${mode === 'mobile' ? 'max-w-[360px]' : 'max-w-full'}`}>
+      <div className="relative overflow-hidden rounded-[26px] border border-[#E4D6C5] bg-[radial-gradient(circle_at_top_left,rgba(214,181,143,.42),transparent_42%),linear-gradient(135deg,#FFFDF8,#F8F0E4_62%,#EEDFCC)] p-5">
+        <div className="mb-7 flex items-center justify-between gap-3">
+          <img src="/assets/nexora-logo-dark.png" alt="NEXORA" className="h-8 w-auto" />
+          <span className="rounded-full border border-[#D6B58F]/70 bg-[#FFFDF8]/80 px-3 py-1 text-[9px] font-black uppercase tracking-[0.18em] text-[#8C634B]">Preview</span>
         </div>
-        <p className="text-[10px] font-black uppercase tracking-[0.24em] text-[#D6B58F]">{launch.eyebrow}</p>
-        <h2 className="mt-3 max-w-xl text-3xl font-black uppercase leading-none tracking-[-0.07em] sm:text-5xl">{launch.title}</h2>
-        <p className="mt-4 max-w-xl text-sm leading-7 text-[#D8C7B0]">{launch.subtitle}</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.24em] text-[#8C634B]">{launch.eyebrow}</p>
+        <h2 className="mt-3 max-w-xl text-3xl font-black uppercase leading-none tracking-[-0.07em] text-[#231916] sm:text-5xl">{launch.title}</h2>
+        <p className="mt-4 max-w-xl text-sm leading-7 text-[#6F5D50]">{launch.subtitle}</p>
         <div className="mt-6 grid grid-cols-4 gap-2">
           {['Days', 'Hours', 'Minutes', 'Seconds'].map((label, index) => (
-            <div key={label} className="rounded-2xl border border-white/10 bg-white/[.06] p-3 text-center">
-              <p className="text-2xl font-black tracking-[-0.06em]">{index === 0 ? '07' : '00'}</p>
-              <p className="mt-1 text-[8px] font-black uppercase tracking-[0.16em] text-[#D6B58F]">{label}</p>
+            <div key={label} className="rounded-2xl border border-[#E4D6C5] bg-[#FFFDF8]/84 p-3 text-center shadow-sm">
+              <p className="text-2xl font-black tracking-[-0.06em] text-[#231916]">{index === 0 ? '07' : '00'}</p>
+              <p className="mt-1 text-[8px] font-black uppercase tracking-[0.16em] text-[#8C634B]">{label}</p>
             </div>
           ))}
         </div>
         <div className="mt-6 flex flex-col gap-2 sm:flex-row">
-          <span className="inline-flex items-center justify-center gap-2 rounded-full bg-[#D6B58F] px-5 py-3 text-[10px] font-black uppercase tracking-[0.16em] text-[#171210]"><MessageCircle className="h-4 w-4" /> {launch.buttonText}</span>
-          {launch.showNotifyForm && <span className="inline-flex items-center justify-center rounded-full border border-white/15 px-5 py-3 text-[10px] font-black uppercase tracking-[0.16em] text-[#FFF8EC]">Notify form</span>}
+          <span className="inline-flex items-center justify-center gap-2 rounded-full bg-[#231916] px-5 py-3 text-[10px] font-black uppercase tracking-[0.16em] text-[#FFFDF8]"><MessageCircle className="h-4 w-4" /> {launch.buttonText}</span>
+          {launch.showNotifyForm && <span className="inline-flex items-center justify-center rounded-full border border-[#D7C5B2] bg-[#FFFDF8]/70 px-5 py-3 text-[10px] font-black uppercase tracking-[0.16em] text-[#5F4D43]">Notify form</span>}
         </div>
       </div>
     </div>
