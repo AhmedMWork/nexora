@@ -25,7 +25,7 @@ begin
 end;
 $$;
 
-create or replace function public.nexora_uuid_primary()
+create or replace function public.nexora_uuid_v5_5_5()
 returns uuid
 language sql
 volatile
@@ -34,7 +34,7 @@ as $$
   select public.nexora_uuid();
 $$;
 
-create or replace function public.nexora_uuid_compat()
+create or replace function public.nexora_uuid_v5_5_4()
 returns uuid
 language sql
 volatile
@@ -44,7 +44,7 @@ as $$
 $$;
 
 -- ============================================================
--- NEXORA — migration bootstrap hotfix
+-- NEXORA V5.5.6 — migration bootstrap hotfix
 -- Must exist before 0009 creates CRM tables on already-live databases.
 -- No dependency on pgcrypto/uuid-ossp/gen_random_bytes.
 -- ============================================================

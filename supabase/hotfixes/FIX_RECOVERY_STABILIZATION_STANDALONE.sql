@@ -25,7 +25,7 @@ begin
 end;
 $$;
 
-create or replace function public.nexora_uuid_primary()
+create or replace function public.nexora_uuid_v5_5_5()
 returns uuid
 language sql
 volatile
@@ -34,7 +34,7 @@ as $$
   select public.nexora_uuid();
 $$;
 
-create or replace function public.nexora_uuid_compat()
+create or replace function public.nexora_uuid_v5_5_4()
 returns uuid
 language sql
 volatile
@@ -44,7 +44,7 @@ as $$
 $$;
 
 -- ============================================================
--- NEXORA — Recovery stabilization hotfix
+-- NEXORA V5.5.5 — Recovery stabilization hotfix
 -- ============================================================
 -- Purpose:
 -- 1) Remove all runtime dependency on pgcrypto/uuid-ossp UUID helpers.
@@ -55,7 +55,7 @@ $$;
 
 
 
--- Compatibility alias for older compatibility defaults if any were already applied.
+-- Compatibility alias for older V5.5.4 defaults if any were already applied.
 
 -- Create release ledger early and with safe UUID defaults.
 create table if not exists public.nexora_system_migrations (
@@ -142,12 +142,12 @@ alter table if exists public.lead_tasks alter column id set default public.nexor
 alter table if exists public.system_setup_events alter column id set default public.nexora_uuid();
 alter table if exists public.nexora_system_migrations alter column id set default public.nexora_uuid();
 
-create index if not exists idx_customer_profiles_phone_lookup on public.customer_profiles(phone);
-create index if not exists idx_customer_profiles_last_order_lookup on public.customer_profiles(last_order_at desc);
-create index if not exists idx_customer_notes_customer_lookup on public.customer_notes(customer_id, created_at desc);
+create index if not exists idx_customer_profiles_phone_v555 on public.customer_profiles(phone);
+create index if not exists idx_customer_profiles_last_order_v555 on public.customer_profiles(last_order_at desc);
+create index if not exists idx_customer_notes_customer_v555 on public.customer_notes(customer_id, created_at desc);
 
 -- Defensive customer refresh. Does not depend on pgcrypto or old defaults.
-create or replace function public.nexora_refresh_customer_profiles()
+create or replace function public.nexora_refresh_customer_profiles_v5_5()
 returns void
 language plpgsql
 security definer
@@ -200,14 +200,14 @@ declare
   test_customer_id uuid;
 begin
   insert into public.customer_profiles(phone, full_name, notes)
-  values ('__nexora_recovery_test__', 'NEXORA Migration Test', 'Temporary migration test row')
+  values ('__nexora_v555_test__', 'NEXORA Migration Test', 'Temporary migration test row')
   on conflict (phone) do update set updated_at = now()
   returning id into test_customer_id;
 
-  delete from public.customer_profiles where phone = '__nexora_recovery_test__';
+  delete from public.customer_profiles where phone = '__nexora_v555_test__';
 
   if test_customer_id is null then
-    raise exception 'NEXORA recovery test could not create a customer profile.';
+    raise exception 'NEXORA V5.5.5 recovery test could not create a customer profile.';
   end if;
 end $$;
 

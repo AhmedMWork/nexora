@@ -25,7 +25,7 @@ begin
 end;
 $$;
 
-create or replace function public.nexora_uuid_primary()
+create or replace function public.nexora_uuid_v5_5_5()
 returns uuid
 language sql
 volatile
@@ -34,7 +34,7 @@ as $$
   select public.nexora_uuid();
 $$;
 
-create or replace function public.nexora_uuid_compat()
+create or replace function public.nexora_uuid_v5_5_4()
 returns uuid
 language sql
 volatile
@@ -44,9 +44,9 @@ as $$
 $$;
 
 -- ============================================================
--- NEXORA — Operations Intelligence, Shipping Control,
+-- NEXORA V5.4 — Operations Intelligence, Shipping Control,
 -- ShipBlu-ready integration, richer product analytics.
--- Safe additive migration intended to run after checkout foundation.
+-- Safe additive migration intended to run after V5.3.
 -- ============================================================
 
 do $nexora_pgcrypto$
@@ -166,7 +166,7 @@ drop policy if exists "service role manages shipping events" on public.shipping_
 create policy "service role manages shipping events" on public.shipping_events for all using (auth.role() = 'service_role') with check (auth.role() = 'service_role');
 
 -- Public-safe calculation exposed only through Edge Function with service role.
-create or replace function public.nexora_calculate_shipping(
+create or replace function public.nexora_calculate_shipping_v5_4(
   governorate_value text,
   city_value text,
   subtotal_value numeric default 0,
@@ -239,8 +239,8 @@ begin
 end;
 $$;
 
--- shipping hardening atomic order creation: same correctness as checkout foundation plus server-side shipping pricing.
-create or replace function public.nexora_create_order_atomic(payload jsonb)
+-- V5.4 atomic order creation: same correctness as V5.3 plus server-side shipping pricing.
+create or replace function public.nexora_create_order_atomic_v5_4(payload jsonb)
 returns jsonb
 language plpgsql
 security definer
@@ -258,7 +258,7 @@ declare
   item_value jsonb;
   product_row record;
 begin
-  -- Estimate subtotal before delegating to checkout foundation so shipping pricing cannot be forged by the client.
+  -- Estimate subtotal before delegating to V5.3 so shipping pricing cannot be forged by the client.
   for item_value in select * from jsonb_array_elements(coalesce(payload->'items', '[]'::jsonb)) loop
     select price into product_row from public.products where id = nullif(item_value->>'productId','')::uuid;
     subtotal_estimate := subtotal_estimate + coalesce(product_row.price, 0) * greatest(1, coalesce((item_value->>'quantity')::integer, 1));
@@ -269,13 +269,13 @@ begin
     coupon_free := (coupon_row.type = 'free_shipping');
   end if;
 
-  v_shipping_quote := public.nexora_calculate_shipping(customer_value->>'governorate', customer_value->>'city', subtotal_estimate, coupon_free);
+  v_shipping_quote := public.nexora_calculate_shipping_v5_4(customer_value->>'governorate', customer_value->>'city', subtotal_estimate, coupon_free);
   if coalesce((v_shipping_quote->>'available')::boolean, false) is false then
     raise exception '%', coalesce(v_shipping_quote->>'reason', 'Shipping is not available.');
   end if;
 
-  -- Reuse checkout foundation transaction then correct shipping totals inside the same wrapper transaction.
-  result := public.nexora_create_order_atomic_base(payload || jsonb_build_object('shippingQuote', v_shipping_quote));
+  -- Reuse V5.3 transaction then correct shipping totals inside the same wrapper transaction.
+  result := public.nexora_create_order_atomic_v5_3(payload || jsonb_build_object('shippingQuote', v_shipping_quote));
   order_id_value := (result->>'orderId')::uuid;
 
   update public.orders

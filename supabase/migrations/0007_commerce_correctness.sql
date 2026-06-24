@@ -25,7 +25,7 @@ begin
 end;
 $$;
 
-create or replace function public.nexora_uuid_primary()
+create or replace function public.nexora_uuid_v5_5_5()
 returns uuid
 language sql
 volatile
@@ -34,7 +34,7 @@ as $$
   select public.nexora_uuid();
 $$;
 
-create or replace function public.nexora_uuid_compat()
+create or replace function public.nexora_uuid_v5_5_4()
 returns uuid
 language sql
 volatile
@@ -44,8 +44,8 @@ as $$
 $$;
 
 -- ============================================================
--- NEXORA — Commerce Correctness, Atomic Orders, Variant Inventory
--- Safe additive migration intended to run after inventory hardening.1.
+-- NEXORA V5.3 — Commerce Correctness, Atomic Orders, Variant Inventory
+-- Safe additive migration intended to run after V5.2.1.
 -- ============================================================
 
 do $$ begin create extension if not exists pgcrypto; exception when others then raise notice 'pgcrypto unavailable: %', sqlerrm; end $$;
@@ -98,7 +98,7 @@ $$;
 -- 4) decrements stock,
 -- 5) increments coupon usage,
 -- 6) writes inventory/order logs.
-create or replace function public.nexora_create_order_atomic_base(payload jsonb)
+create or replace function public.nexora_create_order_atomic_v5_3(payload jsonb)
 returns jsonb
 language plpgsql
 security definer

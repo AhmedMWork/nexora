@@ -25,7 +25,7 @@ begin
 end;
 $$;
 
-create or replace function public.nexora_uuid_primary()
+create or replace function public.nexora_uuid_v5_5_5()
 returns uuid
 language sql
 volatile
@@ -34,7 +34,7 @@ as $$
   select public.nexora_uuid();
 $$;
 
-create or replace function public.nexora_uuid_compat()
+create or replace function public.nexora_uuid_v5_5_4()
 returns uuid
 language sql
 volatile
@@ -44,8 +44,8 @@ as $$
 $$;
 
 -- ============================================================
--- NEXORA — Storefront Controls, Inventory Visibility, Reports Polish
--- Safe additive migration intended to run after inventory hardening Ultimate.
+-- NEXORA V5.2.1 — Storefront Controls, Inventory Visibility, Reports Polish
+-- Safe additive migration intended to run after V5.2 Ultimate.
 -- ============================================================
 
 alter table if exists public.site_settings

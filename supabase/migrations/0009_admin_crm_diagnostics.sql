@@ -25,7 +25,7 @@ begin
 end;
 $$;
 
-create or replace function public.nexora_uuid_primary()
+create or replace function public.nexora_uuid_v5_5_5()
 returns uuid
 language sql
 volatile
@@ -34,7 +34,7 @@ as $$
   select public.nexora_uuid();
 $$;
 
-create or replace function public.nexora_uuid_compat()
+create or replace function public.nexora_uuid_v5_5_4()
 returns uuid
 language sql
 volatile
@@ -44,7 +44,7 @@ as $$
 $$;
 
 -- ============================================================
--- NEXORA — migration bootstrap hotfix
+-- NEXORA V5.5.6 — migration bootstrap hotfix
 -- Must exist before 0009 creates CRM tables on already-live databases.
 -- No dependency on pgcrypto/uuid-ossp/gen_random_bytes.
 -- ============================================================
@@ -52,7 +52,7 @@ $$;
 
 
 -- ============================================================
--- NEXORA — Admin OS, CRM Intelligence, Diagnostics
+-- NEXORA V5.5 — Admin OS, CRM Intelligence, Diagnostics
 -- ============================================================
 
 create table if not exists public.rate_limit_buckets (
@@ -152,7 +152,7 @@ create policy "service manages admin action notes" on public.admin_action_notes 
 drop policy if exists "service manages setup events" on public.system_setup_events;
 create policy "service manages setup events" on public.system_setup_events for all using (auth.role() = 'service_role') with check (auth.role() = 'service_role');
 
-create or replace function public.nexora_rate_limit(
+create or replace function public.nexora_rate_limit_v5_5(
   bucket_key_value text,
   limit_value integer,
   window_seconds integer
@@ -185,7 +185,7 @@ begin
 end;
 $$;
 
-create or replace function public.nexora_refresh_customer_profiles()
+create or replace function public.nexora_refresh_customer_profiles_v5_5()
 returns void
 language plpgsql
 security definer
@@ -228,7 +228,7 @@ begin
 end;
 $$;
 
-create or replace view public.nexora_product_variant_performance as
+create or replace view public.nexora_product_variant_performance_v5_5 as
 select
   oi.product_id,
   oi.product_name,
@@ -242,4 +242,4 @@ from public.order_items oi
 left join public.orders o on o.id = oi.order_id
 group by oi.product_id, oi.product_name, oi.size, oi.color;
 
-select public.nexora_refresh_customer_profiles();
+select public.nexora_refresh_customer_profiles_v5_5();

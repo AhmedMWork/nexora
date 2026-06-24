@@ -25,7 +25,7 @@ begin
 end;
 $$;
 
-create or replace function public.nexora_uuid_primary()
+create or replace function public.nexora_uuid_v5_5_5()
 returns uuid
 language sql
 volatile
@@ -34,7 +34,7 @@ as $$
   select public.nexora_uuid();
 $$;
 
-create or replace function public.nexora_uuid_compat()
+create or replace function public.nexora_uuid_v5_5_4()
 returns uuid
 language sql
 volatile
@@ -44,9 +44,9 @@ as $$
 $$;
 
 -- ============================================================
--- NEXORA — Light Admin + Checkout Stability + Supabase Recovery
+-- NEXORA V5.5.1 — Light Admin + Checkout Stability + Supabase Recovery
 -- Adds storefront control over free-shipping progress messaging and keeps it OFF by default.
--- Safe additive migration intended to run after stable admin.
+-- Safe additive migration intended to run after V5.5.
 -- ============================================================
 
 alter table if exists public.shipping_settings
@@ -59,7 +59,7 @@ update public.shipping_settings
 set show_free_shipping_progress = false
 where id = 'main' and show_free_shipping_progress is null;
 
-create or replace function public.nexora_calculate_shipping(
+create or replace function public.nexora_calculate_shipping_v5_4(
   governorate_value text,
   city_value text,
   subtotal_value numeric default 0,
@@ -138,7 +138,7 @@ $$;
 
 comment on column public.shipping_settings.show_free_shipping_progress is 'Controls whether storefront/checkout shows Add amount more for free shipping. Default false for clean premium checkout.';
 
-create or replace function public.nexora_diagnostics()
+create or replace function public.nexora_diagnostics_v5_5_1()
 returns jsonb
 language plpgsql
 security definer
@@ -165,11 +165,11 @@ begin
     'activeVariantsWithStock', active_variants_with_stock_count,
     'shippingZonesCount', shipping_zones_count,
     'shippingEnabled', coalesce(shipping_enabled_value, false),
-    'orderRpcReady', to_regprocedure('public.nexora_create_order_atomic(jsonb)') is not null,
-    'shippingRpcReady', to_regprocedure('public.nexora_calculate_shipping(text,text,numeric,boolean)') is not null,
-    'rateLimitRpcReady', to_regprocedure('public.nexora_rate_limit(text,integer,integer)') is not null
+    'orderRpcReady', to_regprocedure('public.nexora_create_order_atomic_v5_4(jsonb)') is not null,
+    'shippingRpcReady', to_regprocedure('public.nexora_calculate_shipping_v5_4(text,text,numeric,boolean)') is not null,
+    'rateLimitRpcReady', to_regprocedure('public.nexora_rate_limit_v5_5(text,integer,integer)') is not null
   );
 end;
 $$;
 
-grant execute on function public.nexora_diagnostics() to service_role;
+grant execute on function public.nexora_diagnostics_v5_5_1() to service_role;

@@ -33,7 +33,7 @@ Deno.serve(async (req) => {
     const paymentMethod = ['cod', 'instapay', 'vodafone_cash', 'valu'].includes(String(body?.paymentMethod || '').toLowerCase())
       ? String(body.paymentMethod).toLowerCase()
       : 'cod';
-    const { data, error } = await supabase.rpc('nexora_create_order_atomic', {
+    const { data, error } = await supabase.rpc('nexora_create_order_atomic_v5_4', {
       payload: { ...body, paymentMethod, paymentConfirmationPhone: body?.paymentConfirmationPhone || '01037141322' },
     });
 

@@ -124,7 +124,7 @@ create policy "service role manages order followups" on public.order_followups
 for all using (auth.role() = 'service_role') with check (auth.role() = 'service_role');
 
 -- Replace shipping-aware order wrapper with invoice/payment/follow-up support.
-create or replace function public.nexora_create_order_atomic(payload jsonb)
+create or replace function public.nexora_create_order_atomic_v5_4(payload jsonb)
 returns jsonb
 language plpgsql
 security definer
@@ -162,12 +162,12 @@ begin
     coupon_free := coalesce(coupon_row.type = 'free_shipping', false);
   end if;
 
-  v_shipping_quote := public.nexora_calculate_shipping(customer_value->>'governorate', customer_value->>'city', subtotal_estimate, coupon_free);
+  v_shipping_quote := public.nexora_calculate_shipping_v5_4(customer_value->>'governorate', customer_value->>'city', subtotal_estimate, coupon_free);
   if coalesce((v_shipping_quote->>'available')::boolean, false) is false then
     raise exception '%', coalesce(v_shipping_quote->>'reason', 'Shipping is not available.');
   end if;
 
-  result := public.nexora_create_order_atomic_base(payload || jsonb_build_object('shippingQuote', v_shipping_quote));
+  result := public.nexora_create_order_atomic_v5_3(payload || jsonb_build_object('shippingQuote', v_shipping_quote));
   order_id_value := nullif(result->>'orderId','')::uuid;
   new_order_number := public.nexora_next_order_number();
 

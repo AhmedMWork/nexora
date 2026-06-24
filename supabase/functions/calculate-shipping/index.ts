@@ -18,7 +18,7 @@ Deno.serve(async (req) => {
     }
 
     const supabase = serviceClient();
-    const { data, error } = await supabase.rpc('nexora_calculate_shipping', {
+    const { data, error } = await supabase.rpc('nexora_calculate_shipping_v5_4', {
       governorate_value: governorate,
       city_value: city,
       subtotal_value: subtotal,
