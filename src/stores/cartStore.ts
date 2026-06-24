@@ -82,7 +82,7 @@ export const useCartStore = create<CartStore>()(
       },
     }),
     {
-      name: 'nexora-cart',
+      name: 'nexora-cart-v5-5-3',
       partialize: (state) => ({ items: state.items }),
     }
   )
