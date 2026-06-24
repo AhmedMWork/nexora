@@ -1,6 +1,7 @@
 // ============================================================
-// NEXORA — Premium HQ Sidebar
-// Grouped daily navigation with clear labels, examples, and status-first access.
+// NEXORA V5.5.3 — Clean Light HQ Sidebar
+// Reduced daily navigation. Advanced tools remain reachable via search
+// and contextual links, so the owner-facing admin feels calmer.
 // ============================================================
 
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -29,7 +30,6 @@ import {
   ClipboardList,
   MonitorSmartphone,
   Truck,
-  Rocket,
 } from 'lucide-react';
 import { useState } from 'react';
 import { ADMIN_NAV_GROUPS } from '@/lib/constants';
@@ -56,7 +56,6 @@ const iconMap: Record<string, React.ElementType> = {
   ClipboardList,
   MonitorSmartphone,
   Truck,
-  Rocket,
 };
 
 export default function AdminSidebar() {
@@ -130,12 +129,12 @@ export default function AdminSidebar() {
 
         <div className="space-y-2 border-t border-[#E9DDCF] p-4">
           <Link
-            to="/nexora-admin/launch"
+            to="/nexora-admin/controls"
             onClick={() => setIsMobileOpen(false)}
             className="flex items-center justify-between rounded-2xl border border-[#E4D6C5] bg-[#FAF5EE] px-4 py-3 text-xs font-semibold text-[#6F5D50] hover:border-[#D6B58F] hover:text-[#231916]"
           >
-            <span>Launch Mode</span>
-            <Rocket className="h-4 w-4" />
+            <span>Store Readiness</span>
+            <Settings className="h-4 w-4" />
           </Link>
           <button
             onClick={() => navigate('/')}
