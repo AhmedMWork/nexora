@@ -96,7 +96,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
             decoding="async"
             width={600}
             height={800}
-            className={`absolute inset-0 h-full w-full object-cover transition-all duration-700 ease-out group-hover:scale-[1.045] ${secondaryImage ? 'group-hover:opacity-0' : ''} ${isSoldOut ? 'grayscale opacity-60' : 'opacity-95'}`}
+            className={`absolute inset-0 h-full w-full object-cover transition-all duration-700 ease-out group-hover:scale-[1.035] ${secondaryImage ? 'group-hover:opacity-0' : ''} ${isSoldOut ? 'grayscale opacity-60' : 'opacity-100'}`}
           />
 
           {secondaryImage && (
@@ -107,35 +107,37 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
               decoding="async"
               width={600}
               height={800}
-              className={`absolute inset-0 h-full w-full object-cover opacity-0 transition-all duration-700 ease-out group-hover:scale-[1.045] group-hover:opacity-95 ${isSoldOut ? 'grayscale' : ''}`}
+              className={`absolute inset-0 h-full w-full object-cover opacity-0 transition-all duration-700 ease-out group-hover:scale-[1.035] group-hover:opacity-100 ${isSoldOut ? 'grayscale' : ''}`}
             />
           )}
 
-          <div className="v3-product-grad absolute inset-0 opacity-80" />
+          <div className="v3-product-grad absolute inset-0 opacity-35 sm:opacity-45" />
           {isOnSale && <div className="nexora-sale-shimmer" aria-hidden="true" />}
 
           {badge && (
-            <span className={`absolute top-3 left-3 z-10 border px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.18em] backdrop-blur-xl ${
-              isSoldOut
-                ? 'border-[#8a8175]/30 bg-[#050505]/70 text-[#b8b0a3]'
-                : isOnSale
-                  ? 'nexora-sale-badge border-[#ef4d52]/55 bg-[#ef4d52] text-white shadow-[0_0_24px_rgba(239,77,82,0.26)]'
-                  : 'border-[var(--v33-accent)] bg-[color-mix(in_srgb,var(--v33-card)_72%,transparent)] text-[var(--v33-accent-strong)]'
-            }`}>
+            <span
+              className={`absolute left-2.5 top-2.5 z-10 rounded-full px-2 py-1 text-[8px] font-black uppercase leading-none tracking-[0.12em] sm:left-3 sm:top-3 sm:px-2.5 sm:py-1.5 sm:text-[9px] ${
+                isSoldOut
+                  ? 'border border-[#8a8175]/30 bg-[#050505]/68 text-[#f4f0e8] backdrop-blur-xl'
+                  : isOnSale
+                    ? 'nexora-discount-pill'
+                    : 'border border-[var(--v33-accent)] bg-[color-mix(in_srgb,var(--v33-card)_72%,transparent)] text-[var(--v33-accent-strong)] backdrop-blur-xl'
+              }`}
+            >
               {badge}
             </span>
           )}
 
           <button
             onClick={handleWishlist}
-            className={`absolute right-3 top-3 z-10 p-2.5 transition-all duration-300 ${
+            className={`nexora-card-wishlist absolute right-2.5 top-2.5 z-10 h-8 w-8 transition-all duration-300 sm:right-3 sm:top-3 sm:h-9 sm:w-9 ${
               inWishlist
-                ? 'bg-[var(--v33-accent)] text-[var(--v33-text)]'
-                : 'bg-[color-mix(in_srgb,var(--v33-card)_72%,transparent)] text-[var(--v33-text)] opacity-100 hover:text-[var(--v33-accent-strong)] sm:opacity-0 sm:group-hover:opacity-100'
+                ? 'nexora-card-wishlist-active'
+                : 'opacity-95 hover:text-[var(--v33-accent-strong)] sm:opacity-0 sm:group-hover:opacity-100'
             }`}
             aria-label="Toggle wishlist"
           >
-            <Heart className={`w-3.5 h-3.5 ${inWishlist ? 'fill-current' : ''}`} />
+            <Heart className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${inWishlist ? 'fill-current' : ''}`} />
           </button>
 
           <div className="absolute bottom-0 left-0 right-0 z-10 translate-y-0 transition-transform duration-300 sm:translate-y-full sm:group-hover:translate-y-0">
