@@ -7,9 +7,9 @@ Deno.serve(async (req) => {
 
   try {
     const supabase = serviceClient();
-    const { data, error } = await supabase.rpc('nexora_diagnostics_v5_5_1');
+    const { data, error } = await supabase.rpc('nexora_diagnostics');
     if (error) {
-      return json({ ok: false, error: error.message, fix: 'Run supabase db push for V5.5.1, then redeploy functions.' }, 200, req);
+      return json({ ok: false, error: error.message, fix: 'Run supabase db push for stability, then redeploy functions.' }, 200, req);
     }
     const diag: Record<string, unknown> = data || {};
     const blockers: string[] = [];

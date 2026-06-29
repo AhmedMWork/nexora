@@ -1,62 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://example.com/</loc>
+    <loc>https://nexoraeg.store/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://example.com/shop</loc>
+    <loc>https://nexoraeg.store/shop</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/shop/men</loc>
+    <loc>https://nexoraeg.store/shop/men</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/shop/women</loc>
+    <loc>https://nexoraeg.store/shop/women</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/shop/unisex</loc>
+    <loc>https://nexoraeg.store/shop/unisex</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/limited</loc>
+    <loc>https://nexoraeg.store/limited</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/reviews</loc>
+    <loc>https://nexoraeg.store/reviews</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/contact</loc>
+    <loc>https://nexoraeg.store/contact</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/track</loc>
+    <loc>https://nexoraeg.store/track</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/info/about</loc>
+    <loc>https://nexoraeg.store/info/about</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/info/shipping-returns</loc>
+    <loc>https://nexoraeg.store/info/shipping-returns</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://example.com/info/faq</loc>
+    <loc>https://nexoraeg.store/info/faq</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

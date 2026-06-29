@@ -25,7 +25,7 @@ begin
 end;
 $$;
 
-create or replace function public.nexora_uuid_v5_5_5()
+create or replace function public.nexora_uuid_primary()
 returns uuid
 language sql
 volatile
@@ -34,7 +34,7 @@ as $$
   select public.nexora_uuid();
 $$;
 
-create or replace function public.nexora_uuid_v5_5_4()
+create or replace function public.nexora_uuid_compat()
 returns uuid
 language sql
 volatile
@@ -44,7 +44,7 @@ as $$
 $$;
 
 -- ============================================================
--- NEXORA V5.5.2 — Checkout hotfix for Supabase pgcrypto search_path
+-- NEXORA — Checkout hotfix for Supabase pgcrypto search_path
 -- Fixes: missing pgcrypto random-byte helper inside the checkout RPC
 --
 -- Cause:
@@ -57,7 +57,7 @@ $$;
 --   which is built into PostgreSQL and does not require pgcrypto.
 -- ============================================================
 
-create or replace function public.nexora_create_order_atomic_v5_3(payload jsonb)
+create or replace function public.nexora_create_order_atomic_base(payload jsonb)
 returns jsonb
 language plpgsql
 security definer
@@ -363,4 +363,4 @@ begin
 end;
 $$;
 
-comment on function public.nexora_create_order_atomic_v5_3(jsonb) is 'NEXORA V5.5.2 checkout hotfix: removes pgcrypto random-byte dependency from order number generation.';
+comment on function public.nexora_create_order_atomic_base(jsonb) is 'NEXORA checkout hotfix: removes pgcrypto random-byte dependency from order number generation.';

@@ -25,7 +25,7 @@ begin
 end;
 $$;
 
-create or replace function public.nexora_uuid_v5_5_5()
+create or replace function public.nexora_uuid_primary()
 returns uuid
 language sql
 volatile
@@ -34,7 +34,7 @@ as $$
   select public.nexora_uuid();
 $$;
 
-create or replace function public.nexora_uuid_v5_5_4()
+create or replace function public.nexora_uuid_compat()
 returns uuid
 language sql
 volatile
@@ -44,8 +44,8 @@ as $$
 $$;
 
 -- ============================================================
--- NEXORA V5.1 — Commerce Operations, SEO, Admin, Analytics
--- Safe/idempotent migration intended to run after V5 hardening.
+-- NEXORA — Commerce Operations, SEO, Admin, Analytics
+-- Safe/idempotent migration intended to run after security hardening.
 -- ============================================================
 
 -- Product catalog expansion

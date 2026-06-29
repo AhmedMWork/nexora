@@ -25,7 +25,7 @@ begin
 end;
 $$;
 
-create or replace function public.nexora_uuid_v5_5_5()
+create or replace function public.nexora_uuid_primary()
 returns uuid
 language sql
 volatile
@@ -34,7 +34,7 @@ as $$
   select public.nexora_uuid();
 $$;
 
-create or replace function public.nexora_uuid_v5_5_4()
+create or replace function public.nexora_uuid_compat()
 returns uuid
 language sql
 volatile
@@ -44,14 +44,14 @@ as $$
 $$;
 
 -- ============================================================
--- NEXORA V5 — Production hardening and commerce foundations
+-- NEXORA — Production hardening and commerce foundations
 -- Safe additive migration for V4.9 databases.
 -- ============================================================
 
 do $$ begin create extension if not exists pgcrypto; exception when others then raise notice 'pgcrypto unavailable: %', sqlerrm; end $$;
 
 -- Variant-ready inventory model. The V4 storefront remains compatible
--- with products.stock_by_size/sizes/colors while V5 admin and future work
+-- with products.stock_by_size/sizes/colors while admin and future work
 -- can manage exact size+color SKUs here.
 create table if not exists public.product_variants (
   id uuid primary key default public.nexora_uuid(),
@@ -95,7 +95,7 @@ drop policy if exists "Public read active coupons" on public.coupons;
 drop policy if exists "Public can read active coupons" on public.coupons;
 drop policy if exists "Allow public read active coupons" on public.coupons;
 
--- Settings needed by V5 deployment/SEO controls.
+-- Settings needed by deployment and SEO controls.
 alter table if exists public.site_settings add column if not exists store_status text default 'open' check (store_status in ('open','maintenance','launching'));
 alter table if exists public.site_settings add column if not exists production_domain text;
 alter table if exists public.site_settings add column if not exists splash_enabled boolean default true;

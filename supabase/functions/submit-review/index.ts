@@ -43,6 +43,7 @@ Deno.serve(async (req) => {
     if (error) throw error;
     return json({ id: data.id, status: 'pending' }, 200, req);
   } catch (error) {
-    return json({ error: error instanceof Error ? error.message : 'Could not submit review.' }, 500, req);
+    console.error('[submit_review_failed]', error);
+    return json({ error: 'We could not submit your review right now. Please try again later.' }, 500, req);
   }
 });

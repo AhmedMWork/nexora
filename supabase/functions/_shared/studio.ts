@@ -188,7 +188,7 @@ export async function dbRateLimit(req: Request, key: string, limit = 20, windowS
   try {
     const supabase = serviceClient();
     const bucketKey = `${key}:${clientId(req)}`;
-    const { data, error } = await supabase.rpc('nexora_rate_limit_v5_5', {
+    const { data, error } = await supabase.rpc('nexora_rate_limit', {
       bucket_key_value: bucketKey,
       limit_value: limit,
       window_seconds: windowSeconds,

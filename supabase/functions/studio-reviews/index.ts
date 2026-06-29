@@ -67,6 +67,10 @@ Deno.serve(async (req) => {
 
     return json({ error: 'Unknown action.' }, 400);
   } catch (error) {
-    return json({ error: error instanceof Error ? error.message : 'Studio reviews request failed.' }, 500);
+    console.error('[studio_reviews_failed]', error);
+    return json({
+      error: 'Reviews service needs setup. Check studio-reviews deployment, Supabase secrets, and reviews database columns.',
+      setupIssue: error instanceof Error ? error.message : 'Studio reviews request failed.',
+    }, 500, req);
   }
 });

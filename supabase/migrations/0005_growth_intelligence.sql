@@ -25,7 +25,7 @@ begin
 end;
 $$;
 
-create or replace function public.nexora_uuid_v5_5_5()
+create or replace function public.nexora_uuid_primary()
 returns uuid
 language sql
 volatile
@@ -34,7 +34,7 @@ as $$
   select public.nexora_uuid();
 $$;
 
-create or replace function public.nexora_uuid_v5_5_4()
+create or replace function public.nexora_uuid_compat()
 returns uuid
 language sql
 volatile
@@ -44,8 +44,8 @@ as $$
 $$;
 
 -- ============================================================
--- NEXORA V5.2 — Growth Intelligence, Attribution, Leads, Campaigns
--- Safe/idempotent migration after V5.1.
+-- NEXORA.2 — Growth Intelligence, Attribution, Leads, Campaigns
+-- Safe/idempotent migration after order editing.
 -- ============================================================
 
 do $$ begin create extension if not exists pgcrypto; exception when others then raise notice 'pgcrypto unavailable: %', sqlerrm; end $$;

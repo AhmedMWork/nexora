@@ -1,4 +1,4 @@
-import { corsHeaders, json, serviceClient, rateLimit } from '../_shared/studio.ts';
+import { cors, json, serviceClient, rateLimit } from '../_shared/studio.ts';
 
 function pick(value: unknown) {
   const text = String(value || '').trim();
@@ -11,7 +11,7 @@ function uuidOrNull(value: unknown) {
 }
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+  if (req.method === 'OPTIONS') return new Response('ok', { status: 200, headers: cors(req) });
   const limited = rateLimit(req, 'track-visitor-event', 120, 1000 * 60 * 10);
   if (limited) return limited;
 

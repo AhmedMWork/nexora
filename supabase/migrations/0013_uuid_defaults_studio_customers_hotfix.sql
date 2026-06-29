@@ -25,14 +25,14 @@ begin
 end;
 $$;
 
-create or replace function public.nexora_uuid_v5_5_5()
+create or replace function public.nexora_uuid_primary()
 returns uuid
 language sql
 volatile
 set search_path = public, pg_catalog
 as $$ select public.nexora_uuid(); $$;
 
-create or replace function public.nexora_uuid_v5_5_4()
+create or replace function public.nexora_uuid_compat()
 returns uuid
 language sql
 volatile
@@ -82,7 +82,7 @@ alter table if exists public.lead_tasks alter column id set default public.nexor
 alter table if exists public.admin_action_notes alter column id set default public.nexora_uuid();
 alter table if exists public.system_setup_events alter column id set default public.nexora_uuid();
 
-create or replace function public.nexora_refresh_customer_profiles_v5_5()
+create or replace function public.nexora_refresh_customer_profiles()
 returns void
 language plpgsql
 security definer

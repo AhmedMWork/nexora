@@ -25,14 +25,14 @@ begin
 end;
 $$;
 
-create or replace function public.nexora_uuid_v5_5_5()
+create or replace function public.nexora_uuid_primary()
 returns uuid
 language sql
 volatile
 set search_path = public, pg_catalog
 as $$ select public.nexora_uuid(); $$;
 
-create or replace function public.nexora_uuid_v5_5_4()
+create or replace function public.nexora_uuid_compat()
 returns uuid
 language sql
 volatile
@@ -164,7 +164,7 @@ create index if not exists idx_customer_profiles_phone_recovery on public.custom
 create index if not exists idx_customer_profiles_last_order_recovery on public.customer_profiles(last_order_at desc);
 create index if not exists idx_customer_notes_customer_recovery on public.customer_notes(customer_id, created_at desc);
 
-create or replace function public.nexora_refresh_customer_profiles_v5_5()
+create or replace function public.nexora_refresh_customer_profiles()
 returns void
 language plpgsql
 security definer

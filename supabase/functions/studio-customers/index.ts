@@ -15,10 +15,10 @@ Deno.serve(async (req) => {
     const supabase = serviceClient();
 
     if (body.action === 'refresh') {
-      const { error } = await supabase.rpc('nexora_refresh_customer_profiles_v5_5');
+      const { error } = await supabase.rpc('nexora_refresh_customer_profiles');
       if (error) {
         // Do not hard-crash the admin. Return the exact setup issue while keeping the page usable.
-        return json({ ok: false, warning: error.message, fix: 'Run the V5.5.5 recovery migration, then redeploy studio-customers.' }, 200, req);
+        return json({ ok: false, warning: error.message, fix: 'Run the recovery recovery migration, then redeploy studio-customers.' }, 200, req);
       }
       return json({ ok: true }, 200, req);
     }
@@ -46,7 +46,7 @@ Deno.serve(async (req) => {
     }
 
     let refreshWarning: string | null = null;
-    const refreshResult = await supabase.rpc('nexora_refresh_customer_profiles_v5_5');
+    const refreshResult = await supabase.rpc('nexora_refresh_customer_profiles');
     if (refreshResult.error) refreshWarning = refreshResult.error.message;
 
     const [{ data: customers, error: customersError }, { data: notes, error: notesError }] = await Promise.all([
@@ -110,6 +110,6 @@ Deno.serve(async (req) => {
       warning: `Customer CRM table issue: ${customersError.message}. Showing fallback customers from orders.`,
     }, 200, req);
   } catch (error) {
-    return json({ error: errorMessage(error), fix: 'Run supabase db push with the V5.5.5 package and redeploy Edge Functions.' }, 500, req);
+    return json({ error: errorMessage(error), fix: 'Run supabase db push with the recovery package and redeploy Edge Functions.' }, 500, req);
   }
 });
