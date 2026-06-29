@@ -6,7 +6,6 @@ import { HelmetProvider } from 'react-helmet-async';
 import AppLayout from '@/components/layout/AppLayout';
 import AdminLayout from '@/components/layout/AdminLayout';
 import PageTransition from '@/components/layout/PageTransition';
-import SplashScreen from '@/components/ui/SplashScreen';
 import SkeletonLoader from '@/components/ui/SkeletonLoader';
 import { ThemeProvider } from '@/providers/ThemeProvider';
 import { I18nProvider } from '@/i18n/I18nProvider';
@@ -191,12 +190,6 @@ function MetaPixelGate() {
   return null;
 }
 
-function SplashGate() {
-  const { pathname } = useLocation();
-  if (pathname.startsWith('/admin') || pathname.startsWith('/studio') || pathname.startsWith('/nexora-admin') || pathname === '/opening-soon') return null;
-  return <SplashScreen />;
-}
-
 export default function App() {
   return (
     <ThemeProvider>
@@ -206,7 +199,6 @@ export default function App() {
             <ErrorBoundary>
               <ScrollToTop />
               <MetaPixelGate />
-              <SplashGate />
               <Toaster
                 position="bottom-right"
                 toastOptions={{

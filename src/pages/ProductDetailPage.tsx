@@ -424,7 +424,7 @@ export default function ProductDetailPage() {
                   <span className="absolute bottom-4 right-4 inline-flex items-center gap-2 rounded-full bg-black/55 px-3 py-2 text-[10px] uppercase tracking-[0.16em] text-[#f4f0e8] backdrop-blur">
                     <ZoomIn className="h-3.5 w-3.5" /> Zoom
                   </span>
-                  {discount > 0 && <span className="nexora-sale-badge absolute left-4 top-4 rounded-full border border-[#ef4d52]/50 bg-[#ef4d52] px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-white shadow-[0_0_28px_rgba(239,77,82,0.32)]">Save {discount}%</span>}
+                  {discount > 0 && <span className="nexora-discount-pill absolute left-3 top-3 rounded-full px-2.5 py-1.5 text-[9px] font-black uppercase leading-none tracking-[0.12em] sm:left-4 sm:top-4 sm:px-3 sm:py-1.5 sm:text-[10px]">Save {discount}%</span>}
                 </motion.button>
               </div>
             </div>
