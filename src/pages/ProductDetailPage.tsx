@@ -51,6 +51,7 @@ export default function ProductDetailPage() {
   const [selectedColorId, setSelectedColorId] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(0);
+  const [manualImageIndex, setManualImageIndex] = useState<number | null>(null);
   const [isZoomOpen, setIsZoomOpen] = useState(false);
   const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'description' | 'shipping' | 'reviews'>('description');
@@ -111,12 +112,14 @@ export default function ProductDetailPage() {
     setSelectedColorId('');
     setQuantity(1);
     setActiveImage(0);
+    setManualImageIndex(null);
     setIsZoomOpen(false);
     window.scrollTo(0, 0);
   }, [slug]);
 
   useEffect(() => {
     setSelectedColorId('');
+    setManualImageIndex(null);
     setQuantity(1);
   }, [selectedSize]);
 
@@ -181,6 +184,23 @@ export default function ProductDetailPage() {
     return String(variant.color || '').toLowerCase() === getColorDisplayName(selectedColor).toLowerCase()
       || String(variant.color || '').toLowerCase() === String(selectedColor.id || '').toLowerCase();
   }) || null;
+
+  const selectedColorVariantImage = selectedColor
+    ? activeVariants.find((variant) => {
+      if (!variant.imageUrl) return false;
+      if (selectedSize && String(variant.size || '').toUpperCase() !== selectedSize) return false;
+      const variantColor = String(variant.color || '').toLowerCase();
+      const selectedColorName = getColorDisplayName(selectedColor).toLowerCase();
+      return variantColor === selectedColorName || variantColor === String(selectedColor.id || '').toLowerCase();
+    })?.imageUrl
+    : undefined;
+
+  const galleryImage = productImages[manualImageIndex ?? activeImage] || productImages[activeImage] || productImages[0] || '/assets/nexora-logo-bg.jpg';
+  const displayImage = manualImageIndex !== null
+    ? galleryImage
+    : selectedVariant?.imageUrl || selectedColorVariantImage || galleryImage;
+  const displayImageIndex = productImages.findIndex((image) => image === displayImage);
+
   const selectedSizeData = activeVariants.length
     ? displaySizes.find((s) => s.size === selectedSize)
     : product.sizes.find((s) => s.size === selectedSize);
@@ -194,7 +214,7 @@ export default function ProductDetailPage() {
     : Number(product.rating || 0);
   const reviewCount = visibleReviews.length || Number(product.reviewCount || 0);
   const canonicalUrl = `${SITE_URL}/product/${product.slug}`;
-  const primaryImage = absoluteUrl(productImages[activeImage] || productImages[0] || '/assets/nexora-logo-bg.jpg', SITE_URL);
+  const primaryImage = absoluteUrl(displayImage, SITE_URL);
   const productSchema = {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -249,7 +269,7 @@ export default function ProductDetailPage() {
       return false;
     }
 
-    const image = selectedVariant?.imageUrl || productImages[activeImage] || productImages[0] || '/assets/nexora-logo-bg.jpg';
+    const image = displayImage;
     const colorName = selectedColor ? getColorDisplayName(selectedColor) : undefined;
     addItem({
       productId: product.id,
@@ -291,10 +311,22 @@ export default function ProductDetailPage() {
 
   const submitProductReview = async () => {
     if (!product) return;
-    if (!reviewDraft.customerName.trim() || reviewDraft.body.trim().length < 8) {
-      toast.error('Please add your name and a clear review before submitting.');
+
+    const customerName = reviewDraft.customerName.replace(/\s+/g, ' ').trim();
+    const customerPhone = reviewDraft.customerPhone.replace(/\s+/g, ' ').trim();
+    const title = reviewDraft.title.replace(/\s+/g, ' ').trim();
+    const body = reviewDraft.body.replace(/\s+/g, ' ').trim();
+
+    if (customerName.length < 2) {
+      toast.error('من فضلك اكتب اسمك قبل إرسال التقييم.');
       return;
     }
+
+    if (body.length < 3) {
+      toast.error('من فضلك اكتب تقييم قصير وواضح قبل الإرسال.');
+      return;
+    }
+
     setIsSubmittingReview(true);
     try {
       const { submitCustomerReview } = await import('@/lib/supabase/db');
@@ -302,17 +334,17 @@ export default function ProductDetailPage() {
         reviewType: 'product',
         productId: product.id,
         productName: product.name,
-        customerName: reviewDraft.customerName,
-        customerPhone: reviewDraft.customerPhone,
+        customerName,
+        customerPhone,
         rating: reviewDraft.rating,
-        title: reviewDraft.title,
-        body: reviewDraft.body,
+        title,
+        body,
       });
-      toast.success('Thanks. Your review will appear after admin approval.');
+      toast.success('تم إرسال تقييمك بنجاح وسيظهر بعد مراجعته.');
       setReviewDraft({ customerName: '', customerPhone: '', rating: 5, title: '', body: '' });
     } catch (error) {
       console.error('[product_review_submit_failed]', error);
-      toast.error('We could not submit your review right now. Please try again later.');
+      toast.error('لم نتمكن من إرسال التقييم الآن. حاول مرة أخرى بعد قليل.');
     } finally {
       setIsSubmittingReview(false);
     }
@@ -374,7 +406,7 @@ export default function ProductDetailPage() {
                 {productImages.length > 1 && (
                   <div className="order-2 grid grid-cols-4 gap-3 lg:order-1 lg:grid-cols-1 lg:self-start">
                     {productImages.map((image, index) => (
-                      <button key={`${image}-${index}`} onClick={() => setActiveImage(index)} className={`aspect-square overflow-hidden rounded-2xl border ${activeImage === index ? 'border-[#c8a96a]' : 'border-[#17171a]'} bg-[#0b0b0d]`}>
+                      <button key={`${image}-${index}`} onClick={() => { setActiveImage(index); setManualImageIndex(index); }} className={`aspect-square overflow-hidden rounded-2xl border ${(manualImageIndex ?? displayImageIndex) === index ? 'border-[#c8a96a]' : 'border-[#17171a]'} bg-[#0b0b0d]`}>
                         <OptimizedImage src={image} alt={`${product.name} ${index + 1}`} className="h-full w-full" />
                       </button>
                     ))}
@@ -388,11 +420,11 @@ export default function ProductDetailPage() {
                   className="relative order-1 aspect-[3/4] overflow-hidden rounded-[28px] bg-[#0b0b0d] lg:order-2 text-left"
                   aria-label="Open product image zoom"
                 >
-                  <OptimizedImage src={productImages[activeImage] || productImages[0]} alt={product.name} className="h-full w-full" eager />
+                  <OptimizedImage key={displayImage} src={displayImage} alt={product.name} className="h-full w-full" eager />
                   <span className="absolute bottom-4 right-4 inline-flex items-center gap-2 rounded-full bg-black/55 px-3 py-2 text-[10px] uppercase tracking-[0.16em] text-[#f4f0e8] backdrop-blur">
                     <ZoomIn className="h-3.5 w-3.5" /> Zoom
                   </span>
-                  {discount > 0 && <span className="absolute top-4 left-4 bg-[#c8a96a] text-[#050505] text-[10px] font-bold px-3 py-1.5 tracking-wider uppercase">Save {discount}%</span>}
+                  {discount > 0 && <span className="nexora-sale-badge absolute left-4 top-4 rounded-full border border-[#ef4d52]/50 bg-[#ef4d52] px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-white shadow-[0_0_28px_rgba(239,77,82,0.32)]">Save {discount}%</span>}
                 </motion.button>
               </div>
             </div>
@@ -410,7 +442,7 @@ export default function ProductDetailPage() {
                 </div>
 
                 <div className="flex items-center gap-3 mb-8 pb-8 border-b border-[#17171a]">
-                  <span className="text-3xl font-bold text-[#f4f0e8]">{formatPrice(product.price)}</span>
+                  <span className={`text-3xl font-bold ${discount > 0 ? 'nexora-sale-price' : 'text-[#f4f0e8]'}`}>{formatPrice(product.price)}</span>
                   {product.compareAtPrice && <span className="text-lg text-[#8a8175] line-through">{formatPrice(product.compareAtPrice)}</span>}
                 </div>
 
@@ -448,7 +480,7 @@ export default function ProductDetailPage() {
                         const colorName = getColorDisplayName(color).toLowerCase();
                         const isAvailable = !!selectedSize && color.available !== false && (!activeVariants.length || activeVariants.some((variant) => String(variant.size || '').toUpperCase() === selectedSize && Math.max(0, Number(variant.stock || 0) - Number(variant.reservedStock || 0)) > 0 && (String(variant.color || '').toLowerCase() === colorName || String(variant.color || '').toLowerCase() === String(color.id || '').toLowerCase())));
                         return (
-                          <button key={color.id} type="button" disabled={!isAvailable} onClick={() => { if (!isAvailable) return; setSelectedColorId(color.id); void trackEvent('color_select', { productId: product.id, productName: product.name, color: color.name }); }} className={`flex items-center gap-2 rounded-full border px-3 py-2 text-xs transition-all ${isSelected ? 'border-[#c8a96a] bg-[#c8a96a]/10 text-[#f4f0e8]' : 'border-[#202024] text-[#b8b0a3] hover:border-[#6f675d] hover:text-[#f4f0e8]'} ${!isAvailable ? 'cursor-not-allowed opacity-40' : ''}`}>
+                          <button key={color.id} type="button" disabled={!isAvailable} onClick={() => { if (!isAvailable) return; setSelectedColorId(color.id); setManualImageIndex(null); void trackEvent('color_select', { productId: product.id, productName: product.name, color: color.name }); }} className={`flex items-center gap-2 rounded-full border px-3 py-2 text-xs transition-all ${isSelected ? 'border-[#c8a96a] bg-[#c8a96a]/10 text-[#f4f0e8]' : 'border-[#202024] text-[#b8b0a3] hover:border-[#6f675d] hover:text-[#f4f0e8]'} ${!isAvailable ? 'cursor-not-allowed opacity-40' : ''}`}>
                             <ColorSwatch color={color.hex} pattern={color.pattern} label={getColorDisplayName(color)} size="md" />
                             {getColorDisplayName(color)}
                           </button>
@@ -543,7 +575,7 @@ export default function ProductDetailPage() {
         {isZoomOpen && (
           <motion.div className="fixed inset-0 z-[9998] bg-black/90 p-4 flex items-center justify-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsZoomOpen(false)}>
             <button type="button" className="absolute right-5 top-5 rounded-full border border-white/20 p-3 text-white" onClick={() => setIsZoomOpen(false)} aria-label="Close image zoom"><X className="h-5 w-5" /></button>
-            <motion.img src={productImages[activeImage] || productImages[0] || '/assets/nexora-logo-bg.jpg'} alt={product.name} className="max-h-[90vh] max-w-[94vw] object-contain" initial={{ scale: 0.96 }} animate={{ scale: 1 }} exit={{ scale: 0.96 }} onClick={(e) => e.stopPropagation()} />
+            <motion.img src={displayImage} alt={product.name} className="max-h-[90vh] max-w-[94vw] object-contain" initial={{ scale: 0.96 }} animate={{ scale: 1 }} exit={{ scale: 0.96 }} onClick={(e) => e.stopPropagation()} />
           </motion.div>
         )}
       </AnimatePresence>

@@ -272,7 +272,149 @@
   .section-reveal.visible { opacity: 1; transform: translateY(0); }
   .marquee-track { display: flex; animation: marquee-slide 25s linear infinite; white-space: nowrap; }
   @keyframes marquee-slide { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  .nexora-promo-bar {
+    border-bottom: 1px solid color-mix(in srgb, var(--v33-border) 88%, transparent);
+    box-shadow: 0 16px 45px color-mix(in srgb, var(--v33-shadow) 76%, transparent);
+    isolation: isolate;
+  }
+
+  .nexora-promo-track {
+    gap: .35rem;
+    animation: nexora-luxury-promo-marquee 46s linear infinite;
+    will-change: transform;
+  }
+
+  .nexora-promo-bar:hover .nexora-promo-track {
+    animation-play-state: paused;
+  }
+
+  .nexora-promo-item {
+    text-decoration: none;
+    text-shadow: 0 1px 0 rgba(255,255,255,.24);
+  }
+
+  .nexora-promo-copy {
+    max-width: min(68vw, 560px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: .72rem;
+    font-weight: 950;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: #4A342C;
+  }
+
+  html.dark .nexora-promo-copy {
+    color: #FFF0E1;
+    text-shadow: 0 1px 18px rgba(214,181,143,.18);
+  }
+
+  .nexora-promo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    border: 1px solid color-mix(in srgb, var(--v33-accent-strong) 62%, transparent);
+    border-radius: 999px;
+    background: rgba(255,253,248,.86);
+    color: #281B16;
+    padding: .34rem .78rem;
+    font-size: .62rem;
+    font-weight: 1000;
+    letter-spacing: .18em;
+    line-height: 1;
+    text-transform: uppercase;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.74), 0 8px 22px rgba(82,57,42,.12);
+  }
+
+  html.dark .nexora-promo-badge {
+    background: rgba(255,240,225,.1);
+    color: #FFF0E1;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 8px 24px rgba(0,0,0,.22);
+  }
+
+  .nexora-promo-badge-sale,
+  .nexora-sale-badge {
+    animation: nexora-sale-breathe 2.9s ease-in-out infinite;
+  }
+
+  .nexora-sale-card {
+    position: relative;
+  }
+
+  .nexora-sale-card::before {
+    content: '';
+    pointer-events: none;
+    position: absolute;
+    inset: -1px;
+    z-index: 1;
+    border-radius: inherit;
+    background: linear-gradient(135deg, rgba(239,77,82,.34), transparent 28%, rgba(214,181,143,.3) 72%, transparent);
+    opacity: .42;
+    transition: opacity 260ms ease;
+  }
+
+  .nexora-sale-card:hover::before {
+    opacity: .72;
+  }
+
+  .nexora-sale-shimmer {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg, transparent 18%, rgba(255,255,255,.34) 42%, transparent 64%);
+    transform: translateX(-120%);
+    animation: nexora-sale-shimmer 4.8s ease-in-out infinite;
+    mix-blend-mode: screen;
+  }
+
+  .nexora-sale-price {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    color: #B7413F !important;
+    text-shadow: 0 0 18px rgba(239,77,82,.18);
+    animation: nexora-sale-price-pulse 3.2s ease-in-out infinite;
+  }
+
+  html.dark .nexora-sale-price {
+    color: #FFD1C5 !important;
+  }
+
+  @keyframes nexora-luxury-promo-marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-33.333%); }
+  }
+
+  @keyframes nexora-sale-breathe {
+    0%, 100% { box-shadow: inset 0 1px 0 rgba(255,255,255,.56), 0 0 0 rgba(239,77,82,0), 0 8px 22px rgba(82,57,42,.12); }
+    50% { box-shadow: inset 0 1px 0 rgba(255,255,255,.78), 0 0 18px rgba(239,77,82,.36), 0 10px 28px rgba(214,181,143,.26); }
+  }
+
+  @keyframes nexora-sale-shimmer {
+    0%, 58% { transform: translateX(-120%); opacity: 0; }
+    68% { opacity: .78; }
+    100% { transform: translateX(120%); opacity: 0; }
+  }
+
+  @keyframes nexora-sale-price-pulse {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.18); }
+  }
+
   .text-gradient { background: linear-gradient(135deg, var(--v33-text), var(--v33-accent-strong)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+}
+
+
+
+@media (prefers-reduced-motion: reduce) {
+  .nexora-promo-track,
+  .nexora-promo-badge-sale,
+  .nexora-sale-badge,
+  .nexora-sale-shimmer,
+  .nexora-sale-price {
+    animation: none !important;
+  }
 }
 
 @layer utilities {
@@ -794,6 +936,7 @@ html.dark .v34-logo-img { filter: brightness(1.14) contrast(1.08) drop-shadow(0 
 }
 
 /* NEXORA Experience Upgrade — lightweight motion system */
+
 @layer utilities {
   .motion-soft-reveal {
     animation: nexora-soft-reveal 520ms cubic-bezier(.25,.46,.45,.94) both;

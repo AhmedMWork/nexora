@@ -34,14 +34,25 @@ export default function ReviewsPage() {
   }));
 
   const submitReview = async () => {
-    if (!draft.customerName.trim() || draft.body.trim().length < 8) {
-      toast.error(lang === 'ar' ? 'اكتب اسمك وتقييم واضح قبل الإرسال.' : 'Please add your name and a clear review before submitting.');
+    const customerName = draft.customerName.replace(/\s+/g, ' ').trim();
+    const customerPhone = draft.customerPhone.replace(/\s+/g, ' ').trim();
+    const title = draft.title.replace(/\s+/g, ' ').trim();
+    const body = draft.body.replace(/\s+/g, ' ').trim();
+
+    if (customerName.length < 2) {
+      toast.error(lang === 'ar' ? 'من فضلك اكتب اسمك قبل إرسال التقييم.' : 'Please add your name before submitting.');
       return;
     }
+
+    if (body.length < 3) {
+      toast.error(lang === 'ar' ? 'من فضلك اكتب تقييم قصير وواضح قبل الإرسال.' : 'Please write a short clear review before submitting.');
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const { submitCustomerReview } = await import('@/lib/supabase/db');
-      await submitCustomerReview({ reviewType: 'site', customerName: draft.customerName, customerPhone: draft.customerPhone, rating: draft.rating, title: draft.title, body: draft.body, experienceType: draft.experienceType });
+      await submitCustomerReview({ reviewType: 'site', customerName, customerPhone, rating: draft.rating, title, body, experienceType: draft.experienceType });
       toast.success(lang === 'ar' ? 'تم إرسال تقييمك وسيظهر بعد مراجعته.' : 'Thanks. Your review was submitted and will appear after approval.');
       setDraft({ customerName: '', customerPhone: '', rating: 5, title: '', body: '', experienceType: 'Website experience' });
     } catch (error) {
