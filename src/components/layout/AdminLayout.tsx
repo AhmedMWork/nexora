@@ -1,16 +1,17 @@
 // ============================================================
-// NEXORA V5.5.3 — Clean Light Admin Layout
-// Daily admin stays quiet. Technical recovery is moved into Readiness.
+// NEXORA — Premium Admin Layout
+// Daily operations stay clear, stable, searchable, and action-first.
 // ============================================================
 
-import { type ReactNode, useMemo, useState } from 'react';
+import { type ReactNode, useEffect, useMemo, useState } from 'react';
 import { Navigate, useLocation, Link } from 'react-router-dom';
-import { Search, ShieldCheck, LogOut, Sparkles } from 'lucide-react';
+import { Search, ShieldCheck, LogOut, Sparkles, Rocket, Bell, Plus, ExternalLink, LayoutDashboard, ShoppingBag } from 'lucide-react';
 import toast from 'react-hot-toast';
 import AdminSidebar from '@/components/layout/AdminSidebar';
 import StudioGate from '@/components/admin/StudioGate';
 import { clearStudioToken, getStudioSessionStatus } from '@/lib/supabase/client';
 import { ADMIN_NAV_LINKS } from '@/lib/constants';
+import { isLaunchActive } from '@/lib/launchMode';
 
 interface AdminLayoutProps { children: ReactNode; }
 
@@ -18,6 +19,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const location = useLocation();
   const [query, setQuery] = useState('');
   const session = getStudioSessionStatus();
+  const [launchLocked, setLaunchLocked] = useState(false);
   const isStudioRoot = location.pathname === '/nexora-admin/' || location.pathname === '/nexora-admin';
 
   const matches = useMemo(() => {
@@ -25,6 +27,15 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     if (!q) return [];
     return ADMIN_NAV_LINKS.filter((link) => `${link.label} ${link.description}`.toLowerCase().includes(q)).slice(0, 7);
   }, [query]);
+
+  useEffect(() => {
+    let mounted = true;
+    import('@/lib/supabase/db')
+      .then(({ getSiteSettings }) => getSiteSettings())
+      .then((settings) => { if (mounted) setLaunchLocked(isLaunchActive(settings)); })
+      .catch(() => { if (mounted) setLaunchLocked(false); });
+    return () => { mounted = false; };
+  }, [location.pathname]);
 
   const clearSession = () => {
     clearStudioToken();
@@ -38,8 +49,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     <StudioGate>
       <div className="nexora-admin-light admin-ux-reset min-h-screen bg-[#F8F0E4] text-[#231916]">
         <AdminSidebar />
-        <main className="min-h-screen lg:ml-[268px]">
-          <header className="sticky top-0 z-20 border-b border-[#E4D6C5] bg-[#FFFDF8]/88 px-4 py-3 shadow-[0_10px_28px_rgba(43,33,29,.05)] backdrop-blur-xl lg:px-7">
+        <main className="min-h-screen pb-20 lg:ml-[268px] lg:pb-0">
+          <header className="sticky top-0 z-20 border-b border-[#E4D6C5] bg-[#FFFDF8]/92 py-2 pl-16 pr-4 shadow-[0_10px_28px_rgba(43,33,29,.05)] backdrop-blur-xl lg:px-7 lg:py-3">
             <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
               <div className="flex items-center gap-3">
                 <span className="hidden h-10 w-10 place-items-center rounded-2xl border border-[#E4D6C5] bg-[#FAF5EE] text-[#9D7159] lg:grid">
@@ -47,11 +58,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 </span>
                 <div>
                   <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#B39D89]">NEXORA HQ</p>
-                  <p className="mt-1 text-sm font-semibold text-[#231916]">Daily operations command center</p>
+                  <p className="mt-0.5 text-xs font-semibold text-[#231916] lg:mt-1 lg:text-sm">Daily operations command center</p>
                 </div>
               </div>
 
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+              <div className="hidden flex-col gap-2 lg:flex lg:flex-row lg:items-center">
                 <div className="relative sm:w-[340px]">
                   <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#A48F7E]" />
                   <input
@@ -72,10 +83,26 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   )}
                 </div>
 
+                <Link to="/nexora-admin/launch" className={`inline-flex h-11 items-center justify-center gap-2 rounded-2xl border px-3 text-xs font-semibold ${launchLocked ? 'border-amber-300 bg-amber-50 text-amber-800' : 'border-[#E4D6C5] bg-[#FFFDF8] text-[#6F5D50] hover:border-[#D6B58F] hover:text-[#231916]'}`}>
+                  <Rocket className="h-4 w-4 text-[#9D7159]" />
+                  {launchLocked ? 'Launch Locked' : 'Launch Mode'}
+                </Link>
+                <Link to="/nexora-admin/orders" className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl border border-[#E4D6C5] bg-[#FFFDF8] px-3 text-xs font-semibold text-[#6F5D50] hover:border-[#D6B58F] hover:text-[#231916]">
+                  <Plus className="h-4 w-4 text-[#9D7159]" />
+                  Orders
+                </Link>
                 <Link to="/nexora-admin/controls" className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl border border-[#E4D6C5] bg-[#FFFDF8] px-3 text-xs font-semibold text-[#6F5D50] hover:border-[#D6B58F] hover:text-[#231916]">
                   <ShieldCheck className="h-4 w-4 text-[#9D7159]" />
                   Readiness
                 </Link>
+                <a href="/" target="_blank" rel="noreferrer" className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl border border-[#E4D6C5] bg-[#FFFDF8] px-3 text-xs font-semibold text-[#6F5D50] hover:border-[#D6B58F] hover:text-[#231916]">
+                  <ExternalLink className="h-4 w-4 text-[#9D7159]" />
+                  Store
+                </a>
+                <span className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl border border-[#E4D6C5] bg-[#FFFDF8] px-3 text-xs font-semibold text-[#6F5D50]">
+                  <Bell className="h-4 w-4 text-[#9D7159]" />
+                  Alerts
+                </span>
                 <button onClick={clearSession} className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl border border-[#E4D6C5] bg-[#FFFDF8] px-3 text-xs font-semibold text-[#6F5D50] hover:border-amber-500/40 hover:text-amber-700">
                   <LogOut className="h-3.5 w-3.5" />
                   {session.isActive ? `${session.minutesLeft}m` : 'Locked'}
@@ -83,7 +110,26 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               </div>
             </div>
           </header>
-          <div className="px-4 py-5 lg:px-7 lg:py-7">{children}</div>
+          <div className="px-3 py-4 sm:px-4 lg:px-7 lg:py-7">{children}</div>
+
+          <nav className="fixed inset-x-3 bottom-3 z-40 grid grid-cols-5 gap-1 rounded-[24px] border border-[#E4D6C5] bg-[#FFFDF8]/95 p-2 shadow-[0_18px_60px_rgba(43,33,29,.18)] backdrop-blur-xl lg:hidden" aria-label="Mobile admin shortcuts">
+            {[
+              { label: 'Home', to: '/nexora-admin/dashboard', Icon: LayoutDashboard },
+              { label: 'Orders', to: '/nexora-admin/orders', Icon: ShoppingBag },
+              { label: 'Launch', to: '/nexora-admin/launch', Icon: Rocket },
+              { label: 'Ready', to: '/nexora-admin/controls', Icon: ShieldCheck },
+              { label: 'Store', to: '/', Icon: ExternalLink },
+            ].map(({ label, to, Icon }) => (
+              <Link
+                key={label}
+                to={to}
+                className={`flex min-h-12 flex-col items-center justify-center gap-1 rounded-[18px] text-[10px] font-black text-[#7A6658] transition ${location.pathname === to ? 'bg-[#F2E7D8] text-[#231916]' : 'hover:bg-[#FAF5EE]'}`}
+              >
+                <Icon className="h-4 w-4" />
+                {label}
+              </Link>
+            ))}
+          </nav>
         </main>
       </div>
     </StudioGate>

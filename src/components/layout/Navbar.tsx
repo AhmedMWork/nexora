@@ -1,5 +1,5 @@
 // ============================================================
-// NEXORA V3 — Soft Luxury Editorial Navbar
+// NEXORA — Soft Luxury Editorial Navbar
 // ============================================================
 
 import { useState, useEffect } from 'react';
@@ -62,8 +62,8 @@ export default function Navbar() {
   return (
     <>
       <motion.header
-        style={{ backgroundColor: 'color-mix(in srgb, var(--v33-card) 88%, transparent)', borderBottomColor: 'color-mix(in srgb, var(--v33-border) 82%, transparent)' }}
-        className={`fixed top-[33px] left-0 right-0 z-50 border-b backdrop-blur-2xl transition-shadow duration-300 ${isScrolled ? 'shadow-lg' : ''}`}
+        style={{ backgroundColor: 'color-mix(in srgb, var(--v33-card) 88%, transparent)', borderBottomColor: 'color-mix(in srgb, var(--v33-border) 82%, transparent)', top: 'var(--promo-bar-offset, 0px)' }}
+        className={`fixed left-0 right-0 z-50 border-b backdrop-blur-2xl transition-[top,box-shadow] duration-300 ${isScrolled ? 'shadow-lg' : ''}`}
       >
         <nav className="w-full px-4 sm:px-6 lg:px-10">
           <div className="flex items-center justify-between h-16 lg:h-[4.35rem]">

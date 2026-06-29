@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
 export default function OptimizedImage({
@@ -15,11 +15,6 @@ export default function OptimizedImage({
   eager?: boolean;
 }) {
   const [currentSrc, setCurrentSrc] = useState(src || fallback);
-
-  useEffect(() => {
-    setCurrentSrc(src || fallback);
-  }, [src, fallback]);
-
   return (
     <img
       src={currentSrc || fallback}
