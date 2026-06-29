@@ -18,8 +18,8 @@ Deno.serve(async (req) => {
     const reviewBody = cleanText(body.body, 1200);
     const rating = Math.max(1, Math.min(5, Number(body.rating || 0)));
 
-    if (!customerName) return json({ error: 'Customer name is required.' }, 400, req);
-    if (!reviewBody || reviewBody.length < 8) return json({ error: 'Review text must be at least 8 characters.' }, 400, req);
+    if (customerName.length < 2) return json({ error: 'Please add your name before submitting.' }, 400, req);
+    if (!reviewBody || reviewBody.length < 3) return json({ error: 'Please write a short clear review before submitting.' }, 400, req);
     if (!rating) return json({ error: 'Rating is required.' }, 400, req);
     if (reviewType === 'product' && !body.productId) return json({ error: 'Product id is required for product reviews.' }, 400, req);
 

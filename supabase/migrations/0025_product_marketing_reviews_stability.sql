@@ -5,8 +5,20 @@
 
 do $$ begin create extension if not exists pgcrypto; exception when others then raise notice 'pgcrypto unavailable: %', sqlerrm; end $$;
 
+create or replace function public.nexora_uuid()
+returns uuid
+language sql
+stable
+as $$
+  select gen_random_uuid();
+$$;
+
 -- Product marketing flags used by Products HQ and the animated storefront bar.
 alter table public.products
+  add column if not exists featured boolean not null default false,
+  add column if not exists best_seller boolean not null default false,
+  add column if not exists new_arrival boolean not null default false,
+  add column if not exists is_limited boolean not null default false,
   add column if not exists show_in_announcement_bar boolean not null default false,
   add column if not exists announcement_text text,
   add column if not exists marketing_priority integer not null default 0;
