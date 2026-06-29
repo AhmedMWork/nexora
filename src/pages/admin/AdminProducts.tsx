@@ -33,6 +33,9 @@ type ProductDraft = {
   isNewArrival: boolean;
   isBestSeller: boolean;
   isLimitedDrop: boolean;
+  showInAnnouncementBar: boolean;
+  announcementText: string;
+  marketingPriority: number;
   status: Product['status'];
   sizes: Record<string, number>;
   fit: string;
@@ -63,6 +66,9 @@ const emptyDraft: ProductDraft = {
   isNewArrival: true,
   isBestSeller: false,
   isLimitedDrop: false,
+  showInAnnouncementBar: false,
+  announcementText: '',
+  marketingPriority: 0,
   status: 'active',
   sizes: { S: 10, M: 10, L: 10, XL: 10 },
   fit: 'Regular fit',
@@ -173,6 +179,9 @@ export default function AdminProducts() {
       isNewArrival: product.isNewArrival,
       isBestSeller: product.isBestSeller,
       isLimitedDrop: product.isLimitedDrop,
+      showInAnnouncementBar: Boolean(product.showInAnnouncementBar),
+      announcementText: product.announcementText || '',
+      marketingPriority: Number(product.marketingPriority || 0),
       status: product.status || 'active',
       sizes: Object.keys(stock).length ? stock : emptyDraft.sizes,
       fit: product.fit || 'Regular fit',
@@ -240,6 +249,9 @@ export default function AdminProducts() {
       isNewArrival: draft.isNewArrival,
       isBestSeller: draft.isBestSeller,
       isLimitedDrop: draft.isLimitedDrop,
+      showInAnnouncementBar: draft.showInAnnouncementBar,
+      announcementText: draft.announcementText.trim(),
+      marketingPriority: Number(draft.marketingPriority || 0),
       status: draft.status,
       visibility: draft.status === 'active' ? ('public' as const) : ('private' as const),
       fit: draft.fit,
@@ -440,8 +452,59 @@ export default function AdminProducts() {
             <Field label="Description" help="Clear customer-facing description. Avoid internal notes."><textarea value={draft.description} onChange={(e) => updateDraft('description', e.target.value)} rows={5} className="studio-input" /></Field>
           </div>
 
-          <div className="my-7 grid gap-3 md:grid-cols-4">
-            {flagFields.map(([key, label, help]) => <button key={key} type="button" data-active={draft[key]} className="studio-chip justify-center rounded-2xl px-4 py-3 text-left" onClick={() => updateDraft(key, !draft[key])}><span>{label}</span><span className="sr-only">{help}</span></button>)}
+          <div className="my-7 rounded-[28px] border border-[#332923] bg-[#0E0B0A] p-5">
+            <div className="mb-4">
+              <h3 className="text-sm font-semibold text-[#FFF0E1]">Marketing & Visibility</h3>
+              <p className="mt-1 text-xs leading-5 text-[#BCAEA0]">Choose the same highlights you used to manage in Promotions directly from the product. No separate campaign setup is needed for New Arrival, Best Seller, Limited Drop, or the animated site bar.</p>
+            </div>
+            <div className="grid gap-3 md:grid-cols-4">
+              {flagFields.map(([key, label, help]) => (
+                <button
+                  key={key}
+                  type="button"
+                  data-active={draft[key]}
+                  className="studio-chip min-h-[64px] justify-center rounded-2xl px-4 py-3 text-center"
+                  onClick={() => updateDraft(key, !draft[key])}
+                  title={help}
+                >
+                  <span>{label}</span>
+                </button>
+              ))}
+            </div>
+
+            <div className="mt-5 rounded-[24px] border border-[#5B473C] bg-[#17110F] p-4">
+              <label className="flex items-start gap-3 text-sm font-semibold text-[#FFF0E1]">
+                <input
+                  type="checkbox"
+                  checked={draft.showInAnnouncementBar}
+                  onChange={(e) => updateDraft('showInAnnouncementBar', e.target.checked)}
+                  className="mt-1"
+                />
+                <span>
+                  Show this product in the animated site bar
+                  <span className="mt-1 block text-xs font-normal leading-5 text-[#BCAEA0]">Only active products selected here will appear in the moving bar across the storefront.</span>
+                </span>
+              </label>
+
+              <div className="mt-4 grid gap-4 lg:grid-cols-[1fr_160px]">
+                <Field label="Bar message" help="Optional. Leave empty to auto-generate a clean message from the product name and selected badge.">
+                  <input
+                    value={draft.announcementText}
+                    onChange={(e) => updateDraft('announcementText', e.target.value)}
+                    className="studio-input"
+                    placeholder="Example: New drop just landed — limited quantities."
+                  />
+                </Field>
+                <Field label="Priority" help="Higher numbers appear first in the moving bar.">
+                  <input
+                    type="number"
+                    value={draft.marketingPriority}
+                    onChange={(e) => updateDraft('marketingPriority', Number(e.target.value))}
+                    className="studio-input"
+                  />
+                </Field>
+              </div>
+            </div>
           </div>
 
           <div className="flex flex-wrap gap-3">

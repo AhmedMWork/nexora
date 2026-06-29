@@ -45,7 +45,8 @@ export default function ReviewsPage() {
       toast.success(lang === 'ar' ? 'تم إرسال تقييمك وسيظهر بعد مراجعته.' : 'Thanks. Your review was submitted and will appear after approval.');
       setDraft({ customerName: '', customerPhone: '', rating: 5, title: '', body: '', experienceType: 'Website experience' });
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Could not submit review');
+      console.error('[site_review_submit_failed]', error);
+      toast.error(lang === 'ar' ? 'لم نتمكن من إرسال التقييم الآن. حاول مرة أخرى بعد قليل.' : 'We could not submit your review right now. Please try again later.');
     } finally {
       setIsSubmitting(false);
     }

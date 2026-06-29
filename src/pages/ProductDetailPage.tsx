@@ -311,7 +311,8 @@ export default function ProductDetailPage() {
       toast.success('Thanks. Your review will appear after admin approval.');
       setReviewDraft({ customerName: '', customerPhone: '', rating: 5, title: '', body: '' });
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Could not submit review');
+      console.error('[product_review_submit_failed]', error);
+      toast.error('We could not submit your review right now. Please try again later.');
     } finally {
       setIsSubmittingReview(false);
     }

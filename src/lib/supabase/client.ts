@@ -26,6 +26,12 @@ export const STUDIO_TOKEN_STORAGE_KEYS = [STUDIO_TOKEN_KEY, STUDIO_ACCESS_KEY, S
 
 function friendlyFunctionError(functionName: string, message?: string) {
   const text = String(message || 'Edge Function returned a non-2xx status code');
+  if (functionName === 'studio-reviews') {
+    if (/unauthorized|jwt|token|401/i.test(text)) return 'Studio session expired while loading reviews. Enter your Studio PIN again.';
+    if (/not found|404/i.test(text)) return 'Reviews service is not deployed. Deploy studio-reviews and try again.';
+    if (/relation .*reviews.*does not exist|column .*does not exist|schema|database/i.test(text)) return 'Reviews database setup is incomplete. Run the safe reviews migration, then redeploy studio-reviews.';
+    if (/non-2xx|failed|edge function/i.test(text)) return 'Reviews service needs setup. Check studio-reviews deployment, Supabase secrets, and the reviews table.';
+  }
   if (/unauthorized|jwt|token|401/i.test(text)) {
     return `Studio session expired while loading ${functionName}. Clear Studio session and enter the PIN again.`;
   }

@@ -79,6 +79,9 @@ function rowToProduct(row: Record<string, any>): Product {
     isNewArrival: Boolean(row.new_arrival ?? row.is_new_arrival ?? row.isNewArrival),
     isBestSeller: Boolean(row.best_seller ?? row.is_best_seller ?? row.isBestSeller),
     isLimitedDrop: Boolean(row.is_limited ?? row.isLimitedDrop),
+    showInAnnouncementBar: Boolean(row.show_in_announcement_bar ?? row.showInAnnouncementBar),
+    announcementText: row.announcement_text || row.announcementText || '',
+    marketingPriority: Number(row.marketing_priority ?? row.marketingPriority ?? 0),
     rating: Number(row.rating || 0),
     reviewCount: Number(row.review_count || row.reviewCount || 0),
     seoTitle: row.seo_title || row.seoTitle || row.name_en || row.name || 'NEXORA',
@@ -110,6 +113,9 @@ function productToRow(product: Partial<Product>): Record<string, any> {
     featured: product.isFeatured,
     best_seller: product.isBestSeller,
     new_arrival: product.isNewArrival,
+    show_in_announcement_bar: product.showInAnnouncementBar,
+    announcement_text: product.announcementText,
+    marketing_priority: product.marketingPriority,
     material_en: product.materials?.join(', '),
     fit_en: product.fit,
     care_en: product.careInstructions,
@@ -423,6 +429,25 @@ export async function getAdminProducts(): Promise<Product[]> {
   return (data.products || []).map(rowToProduct);
 }
 
+export async function getAnnouncementProducts(limit = 10): Promise<Product[]> {
+  try {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .eq('show_in_announcement_bar', true)
+      .eq('status', 'active')
+      .order('marketing_priority', { ascending: false })
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    if (error) throw error;
+    return (data || []).map(rowToProduct);
+  } catch (error) {
+    console.warn('Could not load announcement products:', error);
+    return [];
+  }
+}
+
 export async function getProductBySlug(slug: string): Promise<Product | null> {
   const { data, error } = await supabase.from('products').select('*').eq('slug', slug).in('status', ['active', 'sold_out']).maybeSingle();
   if (error) throw error;
@@ -617,8 +642,12 @@ export async function deleteDrop(id: string): Promise<void> { await invokeStudio
 // Reviews
 export async function submitCustomerReview(review: { reviewType?: 'product' | 'site'; productId?: string; productName?: string; customerName: string; customerPhone?: string; rating: number; title?: string; body: string; experienceType?: string; orderNumber?: string }): Promise<string> {
   const { data, error } = await supabase.functions.invoke<{ id: string }>('submit-review', { body: review });
-  if (error) throw error;
-  return data?.id || '';
+  if (error) {
+    console.error('[review_submit_failed]', error);
+    throw new Error('We could not submit your review right now. Please try again later.');
+  }
+  if (!data?.id) throw new Error('We could not submit your review right now. Please try again later.');
+  return data.id;
 }
 
 export async function getReviews(filters?: { productId?: string; isApproved?: boolean; isFeatured?: boolean }): Promise<Review[]> {

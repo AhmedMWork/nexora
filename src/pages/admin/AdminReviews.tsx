@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { CheckCircle2, Eye, EyeOff, ImagePlus, Plus, RefreshCw, Star, Trash2, X, XCircle } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Eye, EyeOff, ImagePlus, Plus, RefreshCw, Star, Trash2, X, XCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { uploadProductImage } from '@/services/upload.service';
 import type { Product, Review } from '@/types';
@@ -63,6 +63,7 @@ export default function AdminReviews() {
   const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [setupIssue, setSetupIssue] = useState('');
   const [draft, setDraft] = useState<ReviewDraft>(emptyDraft);
 
   const loadReviews = async () => {
@@ -70,8 +71,12 @@ export default function AdminReviews() {
     try {
       const { getReviews } = await import('@/lib/supabase/db');
       setReviews(await getReviews());
+      setSetupIssue('');
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Could not load reviews');
+      console.error('[admin_reviews_load_failed]', error);
+      setReviews([]);
+      setSetupIssue(error instanceof Error ? error.message : 'Reviews service needs setup.');
+      toast.error('Reviews service needs setup. Use the checklist below.');
     } finally {
       setIsLoading(false);
     }
@@ -120,7 +125,8 @@ export default function AdminReviews() {
       updateDraft('images', [...draft.images, url]);
       toast.success('Review image uploaded');
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Could not upload review image');
+      console.error('[admin_review_image_upload_failed]', error);
+      toast.error('Could not upload review image. Check media storage setup.');
     } finally {
       setIsUploading(false);
     }
@@ -136,7 +142,8 @@ export default function AdminReviews() {
       setIsCreating(false);
       void loadReviews();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Could not create review');
+      console.error('[admin_review_create_failed]', error);
+      toast.error('Could not save review. Check studio-reviews setup and try again.');
     }
   };
 
@@ -147,7 +154,8 @@ export default function AdminReviews() {
       setReviews((current) => current.map((r) => r.id === review.id ? { ...r, ...patch } : r));
       toast.success(message);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Could not update review');
+      console.error('[admin_review_update_failed]', error);
+      toast.error('Could not update review. Check studio-reviews setup and try again.');
     }
   };
 
@@ -159,7 +167,8 @@ export default function AdminReviews() {
       setReviews((current) => current.filter((r) => r.id !== id));
       toast.success('Review archived');
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Could not archive review');
+      console.error('[admin_review_archive_failed]', error);
+      toast.error('Could not archive review. Check studio-reviews setup and try again.');
     }
   };
 
@@ -181,6 +190,27 @@ export default function AdminReviews() {
       <div className="grid gap-3 md:grid-cols-4">
         {[['Pending', stats.pending], ['Published', stats.published], ['Featured', stats.featured], ['Hidden', stats.hidden]].map(([label, value]) => <div key={label} className="rounded-[26px] border border-[#e6ded1] bg-white p-4"><p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#9a8461]">{label}</p><p className="mt-3 text-3xl font-black">{value}</p></div>)}
       </div>
+
+      {setupIssue && (
+        <div className="rounded-[28px] border border-amber-200 bg-amber-50 p-5 text-[#5f4724]">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex gap-3">
+              <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
+              <div>
+                <h2 className="text-sm font-black uppercase tracking-[0.16em]">Reviews service needs setup</h2>
+                <p className="mt-2 text-sm leading-6">The admin page stayed safe and no customer data was changed. Review the setup points below, then press Refresh.</p>
+                <p className="mt-2 rounded-2xl bg-white/70 p-3 text-xs leading-5 text-[#5f584f]">{setupIssue}</p>
+                <ul className="mt-3 list-disc space-y-1 pl-5 text-xs leading-5">
+                  <li>Deploy <strong>studio-reviews</strong> and <strong>submit-review</strong>.</li>
+                  <li>Confirm <strong>SUPABASE_SERVICE_ROLE_KEY</strong> and <strong>ALLOWED_ORIGIN</strong> secrets.</li>
+                  <li>Run the safe reviews migration if the reviews table or columns are missing.</li>
+                </ul>
+              </div>
+            </div>
+            <button onClick={loadReviews} className="nexora-button"><RefreshCw className="h-4 w-4" />Retry</button>
+          </div>
+        </div>
+      )}
 
       {isCreating && (
         <div className="rounded-[30px] border border-[#e6ded1] bg-white p-5 shadow-[0_18px_50px_rgba(43,33,29,0.06)] sm:p-7 space-y-5">

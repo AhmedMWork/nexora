@@ -64,6 +64,9 @@ export interface Product {
   isNewArrival: boolean;
   isBestSeller: boolean;
   isLimitedDrop: boolean;
+  showInAnnouncementBar?: boolean;
+  announcementText?: string;
+  marketingPriority?: number;
   rating: number;
   reviewCount: number;
   seoTitle: string;
