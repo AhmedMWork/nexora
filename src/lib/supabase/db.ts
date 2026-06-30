@@ -449,21 +449,42 @@ function studioHeadersPayload<T extends Record<string, unknown>>(action: string,
 
 // Products
 export async function getProducts(filters?: { category?: string; isFeatured?: boolean; isNewArrival?: boolean; isBestSeller?: boolean; isLimitedDrop?: boolean; includeHidden?: boolean }): Promise<Product[]> {
-  let q = supabase.from('products').select('*').order('created_at', { ascending: false });
-  if (!filters?.includeHidden) q = q.in('status', ['active', 'sold_out']);
-  if (filters?.category) {
-    const category = String(filters.category).toLowerCase();
-    if (category === 'men') q = q.in('gender', ['men', 'unisex']);
-    else if (category === 'women') q = q.in('gender', ['women', 'unisex']);
-    else if (category === 'unisex') q = q.eq('gender', 'unisex');
-    else q = q.eq('gender', category);
+  const applyBaseFilters = (query: any, useTargetAudience = true) => {
+    let q = query.select('*').order('created_at', { ascending: false });
+    if (!filters?.includeHidden) q = q.in('status', ['active', 'sold_out']);
+    if (filters?.category) {
+      const category = String(filters.category).toLowerCase();
+      if (useTargetAudience) {
+        if (category === 'men') q = q.in('target_audience', ['men', 'unisex', 'all']);
+        else if (category === 'women') q = q.in('target_audience', ['women', 'unisex', 'all']);
+        else if (category === 'unisex') q = q.in('target_audience', ['unisex', 'all']);
+        else q = q.eq('target_audience', category);
+      } else {
+        if (category === 'men') q = q.in('gender', ['men', 'unisex']);
+        else if (category === 'women') q = q.in('gender', ['women', 'unisex']);
+        else if (category === 'unisex') q = q.eq('gender', 'unisex');
+        else q = q.eq('gender', category);
+      }
+    }
+    if (filters?.isFeatured) q = q.eq('featured', true);
+    if (filters?.isNewArrival) q = q.eq('new_arrival', true);
+    if (filters?.isBestSeller) q = q.eq('best_seller', true);
+    if (filters?.isLimitedDrop) q = q.or('is_limited.eq.true,is_drop.eq.true');
+    return q;
+  };
+
+  const { data, error } = await applyBaseFilters(supabase.from('products'), true);
+
+  if (error) {
+    const raw = String(error.message || error);
+    if (/target_audience/i.test(raw)) {
+      const fallback = await applyBaseFilters(supabase.from('products'), false);
+      if (fallback.error) throw fallback.error;
+      return (fallback.data || []).map(rowToProduct);
+    }
+    throw error;
   }
-  if (filters?.isFeatured) q = q.eq('featured', true);
-  if (filters?.isNewArrival) q = q.eq('new_arrival', true);
-  if (filters?.isBestSeller) q = q.eq('best_seller', true);
-  if (filters?.isLimitedDrop) q = q.or('is_limited.eq.true,is_drop.eq.true');
-  const { data, error } = await q;
-  if (error) throw error;
+
   return (data || []).map(rowToProduct);
 }
 

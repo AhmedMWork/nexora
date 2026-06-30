@@ -1195,3 +1195,176 @@ html.dark .v34-logo-img { filter: brightness(1.14) contrast(1.08) drop-shadow(0 
     }
   }
 }
+
+/* NEXORA — High contrast readability pass for storefront + admin
+   Fixes muted text blending with ivory/mocha surfaces and makes promo/campaign
+   copy clearer without changing the brand palette or database data. */
+@layer components {
+  :root,
+  html.light {
+    --v33-muted: #5C4338;
+    --v33-subtle: #73594A;
+    --v33-accent-strong: #87543E;
+    --v33-border: #C8B39F;
+  }
+
+  html.dark {
+    --v33-muted: #E6D5C5;
+    --v33-subtle: #CBB5A3;
+    --v33-accent-strong: #F1C2A7;
+    --v33-border: #735D50;
+  }
+
+  html.light [class*="text-[#A48F7E]"],
+  html.light [class*="text-[#B39D89]"],
+  html.light [class*="text-[#8A7A72]"],
+  html.light [class*="text-[#7A6658]"],
+  html.light [class*="text-[#6F5D50]"],
+  html.light [class*="text-[#735B4F]"] {
+    color: #5C4338 !important;
+  }
+
+  html.light [class*="text-[#D09A82]"],
+  html.light [class*="text-[#D7B98E]"],
+  html.light [class*="text-[#D6B58F]"],
+  html.light [class*="text-[#9D7159]"] {
+    color: #7C4D39 !important;
+  }
+
+  html.dark [class*="text-[#BCAEA0]"],
+  html.dark [class*="text-[#A7AEBB]"],
+  html.dark [class*="text-[#D2C0B0]"],
+  html.dark [class*="text-[#A28E7F]"] {
+    color: #E6D5C5 !important;
+  }
+
+  .nexora-body,
+  .v3-lead,
+  .v33-empty-panel,
+  .v3-inline-link,
+  .v33-stat-card span {
+    color: var(--v33-muted) !important;
+  }
+
+  .nexora-promo-bar {
+    box-shadow: 0 14px 34px rgba(43, 33, 29, .12);
+  }
+
+  .nexora-promo-copy {
+    color: #241711;
+    font-size: .68rem;
+    letter-spacing: .085em;
+    font-weight: 950;
+  }
+
+  .nexora-promo-badge {
+    color: #1D120E;
+    border-color: rgba(82, 57, 42, .34);
+    background: rgba(255, 253, 248, .92);
+  }
+
+  html.dark .nexora-promo-copy,
+  html.dark .nexora-promo-badge {
+    color: #FFF6EA;
+  }
+
+  .nexora-promo-item:hover,
+  .nexora-promo-item:focus-visible {
+    color: inherit;
+    opacity: 1;
+  }
+
+  @media (max-width: 640px) {
+    .nexora-promo-copy {
+      font-size: .56rem;
+      letter-spacing: .045em;
+      font-weight: 950;
+    }
+    .nexora-promo-badge {
+      font-size: .48rem;
+      letter-spacing: .06em;
+      padding: .22rem .44rem;
+    }
+  }
+
+  .admin-ux-reset,
+  .nexora-admin-light {
+    --admin-muted: #4E392F;
+    --admin-subtle: #675043;
+    --admin-accent-strong: #6F3F2F;
+    color: var(--admin-text) !important;
+  }
+
+  .admin-ux-reset p,
+  .admin-ux-reset small,
+  .admin-ux-reset td,
+  .admin-ux-reset th,
+  .admin-ux-reset li,
+  .admin-ux-reset .studio-help,
+  .nexora-admin-light p,
+  .nexora-admin-light small,
+  .nexora-admin-light td,
+  .nexora-admin-light th,
+  .nexora-admin-light li,
+  .nexora-admin-light .studio-help {
+    color: var(--admin-muted) !important;
+  }
+
+  .admin-ux-reset h1,
+  .admin-ux-reset h2,
+  .admin-ux-reset h3,
+  .admin-ux-reset h4,
+  .admin-ux-reset label,
+  .nexora-admin-light h1,
+  .nexora-admin-light h2,
+  .nexora-admin-light h3,
+  .nexora-admin-light h4,
+  .nexora-admin-light label {
+    color: var(--admin-text) !important;
+  }
+
+  .admin-ux-reset [class*="text-[#B39D89]"],
+  .admin-ux-reset [class*="text-[#A48F7E]"],
+  .admin-ux-reset [class*="text-[#7A6658]"],
+  .admin-ux-reset [class*="text-[#6F5D50]"],
+  .admin-ux-reset [class*="text-[#BCAEA0]"],
+  .admin-ux-reset [class*="text-[#A7AEBB]"],
+  .nexora-admin-light [class*="text-[#B39D89]"],
+  .nexora-admin-light [class*="text-[#A48F7E]"],
+  .nexora-admin-light [class*="text-[#7A6658]"],
+  .nexora-admin-light [class*="text-[#6F5D50]"],
+  .nexora-admin-light [class*="text-[#BCAEA0]"],
+  .nexora-admin-light [class*="text-[#A7AEBB]"] {
+    color: var(--admin-muted) !important;
+  }
+
+  .admin-ux-reset [class*="text-[#D7B98E]"],
+  .admin-ux-reset [class*="text-[#9D7159]"],
+  .admin-ux-reset [class*="text-[#c8a96a]"],
+  .nexora-admin-light [class*="text-[#D7B98E]"],
+  .nexora-admin-light [class*="text-[#9D7159]"],
+  .nexora-admin-light [class*="text-[#c8a96a]"] {
+    color: var(--admin-accent-strong) !important;
+  }
+
+  .admin-ux-reset .studio-input,
+  .admin-ux-reset .admin-input,
+  .admin-ux-reset input,
+  .admin-ux-reset textarea,
+  .admin-ux-reset select,
+  .nexora-admin-light .studio-input,
+  .nexora-admin-light .admin-input,
+  .nexora-admin-light input,
+  .nexora-admin-light textarea,
+  .nexora-admin-light select {
+    color: #1F1512 !important;
+    background: #FFFDF8 !important;
+  }
+
+  .admin-ux-reset input::placeholder,
+  .admin-ux-reset textarea::placeholder,
+  .nexora-admin-light input::placeholder,
+  .nexora-admin-light textarea::placeholder {
+    color: #806A5A !important;
+  }
+}
