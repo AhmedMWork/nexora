@@ -61,10 +61,28 @@ export default function ShopPage() {
   const filteredProducts = useMemo(() => {
     let result = [...products];
 
-    // Collection filter
-    if (selectedCollection) {
-      result = result.filter((p) => p.category === selectedCollection);
+// Collection / audience filter
+if (selectedCollection) {
+  result = result.filter((product) => {
+    const audience = String(
+      product.targetAudience || product.gender || product.category || ''
+    ).toLowerCase();
+
+    if (selectedCollection === 'men') {
+      return audience === 'men' || audience === 'unisex' || audience === 'all';
     }
+
+    if (selectedCollection === 'women') {
+      return audience === 'women' || audience === 'unisex' || audience === 'all';
+    }
+
+    if (selectedCollection === 'unisex') {
+      return audience === 'unisex' || audience === 'all';
+    }
+
+    return product.category === selectedCollection || audience === selectedCollection;
+  });
+}
 
     // Search
     if (searchQuery) {
