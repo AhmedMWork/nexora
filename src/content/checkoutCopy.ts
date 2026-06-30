@@ -18,7 +18,7 @@ export const checkoutCopy = {
     title: 'إتمام الطلب',
     intro: 'أكمل بياناتك بوضوح، اختر طريقة الدفع، وراجع الإجمالي النهائي قبل تأكيد الطلب. سنؤكد طلبك على واتساب بعد التسجيل.',
     steps: ['بياناتك', 'التوصيل', 'الدفع', 'التأكيد'],
-    trustItems: ['تأكيد واتساب', 'إجمالي واضح', 'تحديث الطلب بسهولة'],
+    trustItems: ['تأكيد واتساب', 'معاينة عند الاستلام', 'إجمالي واضح'],
     contactTitle: 'بيانات التواصل',
     fullName: 'الاسم بالكامل *',
     fullNamePlaceholder: 'اكتب اسمك بالكامل',
@@ -83,8 +83,8 @@ export const checkoutCopy = {
       cod: {
         label: 'الدفع عند الاستلام',
         badge: 'بدون تحويل',
-        description: 'ادفع نقدًا عند وصول الطلب. لا تحتاج لتحويل أي مبلغ قبل الاستلام.',
-        note: 'الخطوة التالية: سنراجع تفاصيل الطلب والعنوان معك على واتساب قبل التجهيز والشحن.',
+        description: 'ادفع نقدًا عند وصول الطلب. تقدر تعاين المنتج والمقاس أثناء وجود مندوب الشحن قبل قبول الطلب.',
+        note: 'الخطوة التالية: سنراجع التفاصيل على واتساب. عند الاستلام يمكنك رفض أو استرجاع الطلب فورًا إذا المنتج أو المقاس غير مناسب قبل مغادرة المندوب.',
         cta: (total: string) => `تأكيد الطلب — ${total}`,
       },
       instapay: {
@@ -123,7 +123,7 @@ export const checkoutCopy = {
     title: 'Checkout',
     intro: 'Complete your details, choose how you want to pay, and review the final total before placing the order. We will confirm everything on WhatsApp afterward.',
     steps: ['Details', 'Delivery', 'Payment', 'Confirmation'],
-    trustItems: ['WhatsApp confirmation', 'Clear final total', 'Easy order updates'],
+    trustItems: ['WhatsApp confirmation', 'Preview on delivery', 'Clear final total'],
     contactTitle: 'Contact details',
     fullName: 'Full name *',
     fullNamePlaceholder: 'Enter your full name',
@@ -188,8 +188,8 @@ export const checkoutCopy = {
       cod: {
         label: 'Cash on Delivery',
         badge: 'No transfer',
-        description: 'Pay in cash when the order arrives. No transfer is needed before delivery.',
-        note: 'Next step: we will confirm the order details and address with you on WhatsApp before preparation and dispatch.',
+        description: 'Pay in cash when the order arrives. You can inspect the item and size while the courier is present before accepting the order.',
+        note: 'Next step: we will confirm the details on WhatsApp. On delivery, you may return the order immediately if the item or size is not suitable before the courier leaves.',
         cta: (total: string) => `Place order — ${total}`,
       },
       instapay: {

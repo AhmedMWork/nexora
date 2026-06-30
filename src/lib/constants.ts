@@ -103,7 +103,6 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
     links: [
       { label: 'Products', href: '/nexora-admin/products', icon: 'Package', description: 'Manage products, images, prices, sizes, colors, variants, SEO and publishing' },
       { label: 'Inventory', href: '/nexora-admin/inventory', icon: 'Warehouse', description: 'Size/color stock, low stock thresholds and inventory adjustments' },
-      { label: 'Drops', href: '/nexora-admin/drops', icon: 'CalendarClock', description: 'Limited releases and scheduled drops' },
       { label: 'Coupons', href: '/nexora-admin/coupons', icon: 'Tag', description: 'Discount codes, free shipping and campaign offers' },
     ],
   },
@@ -113,7 +112,6 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
       { label: 'Customers', href: '/nexora-admin/customers', icon: 'UserRound', description: 'Customer profiles, orders, notes, reviews and WhatsApp actions' },
       { label: 'Leads', href: '/nexora-admin/leads', icon: 'UserPlus', description: 'Potential customers and follow-up queue' },
       { label: 'Campaigns', href: '/nexora-admin/campaigns', icon: 'Target', description: 'Campaign URLs, attribution and marketing launches' },
-      { label: 'Promotions', href: '/nexora-admin/promotions', icon: 'BadgePercent', description: 'Promo messages and announcement bar' },
     ],
   },
   {
@@ -141,9 +139,7 @@ export const ADMIN_SECONDARY_NAV_LINKS: AdminNavLink[] = [
   { label: 'Visitors', href: '/nexora-admin/visitors', icon: 'MousePointerClick', description: 'Visitor journey and behavior analytics' },
   { label: 'Campaigns', href: '/nexora-admin/campaigns', icon: 'Target', description: 'Campaign URLs and traffic attribution' },
   { label: 'Analytics', href: '/nexora-admin/analytics', icon: 'BarChart3', description: 'Cart, checkout, product engagement, and revenue signals' },
-  { label: 'Promotions', href: '/nexora-admin/promotions', icon: 'BadgePercent', description: 'Promo messages and announcement bar' },
   { label: 'Coupons', href: '/nexora-admin/coupons', icon: 'Tag', description: 'Discount codes and campaign offers' },
-  { label: 'Drops', href: '/nexora-admin/drops', icon: 'CalendarClock', description: 'Limited releases and scheduled drops' },
   { label: 'SEO', href: '/nexora-admin/seo', icon: 'SearchCheck', description: 'Search visibility, sitemap, and indexing' },
 ];
 

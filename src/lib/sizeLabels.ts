@@ -31,7 +31,8 @@ export function getSizeDisplayLabel(size?: string, explicitWeightRange?: string,
 }
 
 export const RETURN_EXCHANGE_POLICY_AR = [
-  'الاسترجاع متاح فقط أثناء تواجد مندوب الشحن.',
+  'المعاينة متاحة عند الاستلام أثناء تواجد مندوب الشحن حتى تطمئن على المنتج والمقاس.',
+  'إذا لم يعجبك المنتج أو كان المقاس غير مناسب، يمكنك استرجاع الطلب فورًا قبل مغادرة المندوب.',
   'يُرجى مراجعة الطلب جيدًا قبل مغادرة المندوب، ولا يُقبل الاسترجاع بعد ذلك.',
   'في حالة وجود مشكلة في الطباعة، يمكن استرجاع المنتج خلال 14 يومًا من الاستلام.',
   'الاستبدال متاح خلال 5 أيام من الاستلام عبر التواصل على واتساب.',
@@ -42,3 +43,6 @@ export const RETURN_EXCHANGE_POLICY_AR = [
 
 export const SHIPPING_ESTIMATE_TEXT = '4-7 business days, excluding Fridays and official holidays.';
 export const SHIPPING_ESTIMATE_TEXT_AR = 'من 4 إلى 7 أيام عمل، عدا الجمعة والعطلات الرسمية.';
+
+export const DELIVERY_PREVIEW_TEXT = 'Preview on delivery is available while the courier is present. If the item is not suitable or the size is not right, return it immediately before the courier leaves.';
+export const DELIVERY_PREVIEW_TEXT_AR = 'المعاينة متاحة عند الاستلام أثناء تواجد مندوب الشحن. إذا المنتج غير مناسب أو المقاس غير مضبوط، يمكن استرجاعه فورًا قبل مغادرة المندوب.';

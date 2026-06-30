@@ -41,6 +41,11 @@ function normalizeImages(row: Record<string, any>): string[] {
   return [];
 }
 
+function normalizeAudience(row: Record<string, any>): Product['targetAudience'] {
+  const value = String(row.target_audience || row.targetAudience || row.gender || row.category || 'unisex').toLowerCase();
+  return ['men', 'women', 'unisex', 'all'].includes(value) ? value as Product['targetAudience'] : 'unisex';
+}
+
 function rowToProduct(row: Record<string, any>): Product {
   const sizesRaw = row.sizes ?? [];
   const stockBySize = row.stock_by_size ?? {};
@@ -49,6 +54,8 @@ function rowToProduct(row: Record<string, any>): Product {
       ? { size, stock: Number(stockBySize[size] ?? 0), lowStockThreshold: 3 }
       : { size: String(size.size || size.label || 'M'), stock: Number(size.stock ?? stockBySize[size.size] ?? 0), lowStockThreshold: Number(size.lowStockThreshold ?? size.low_stock_threshold ?? 3) })
     : Object.entries(stockBySize).map(([size, stock]) => ({ size, stock: Number(stock), lowStockThreshold: 3 }));
+  const targetAudience = normalizeAudience(row);
+  const storefrontCategory = targetAudience === 'men' || targetAudience === 'women' ? targetAudience : 'unisex';
 
   return {
     id: row.id,
@@ -59,8 +66,9 @@ function rowToProduct(row: Record<string, any>): Product {
     price: Number(row.price || 0),
     compareAtPrice: row.compare_at_price ? Number(row.compare_at_price) : row.compareAtPrice,
     costPrice: row.cost_price ? Number(row.cost_price) : row.costPrice,
-    category: (row.gender || row.category || 'unisex') as Product['category'],
-    gender: (row.gender || row.category || 'unisex') as Product['gender'],
+    category: storefrontCategory as Product['category'],
+    gender: storefrontCategory as Product['gender'],
+    targetAudience,
     collection: row.collection || row.collection_id || 'Essentials',
     dropId: row.drop_id || row.dropId,
     images: normalizeImages(row),
@@ -78,8 +86,21 @@ function rowToProduct(row: Record<string, any>): Product {
     isFeatured: Boolean(row.featured ?? row.is_featured ?? row.isFeatured),
     isNewArrival: Boolean(row.new_arrival ?? row.is_new_arrival ?? row.isNewArrival),
     isBestSeller: Boolean(row.best_seller ?? row.is_best_seller ?? row.isBestSeller),
-    isLimitedDrop: Boolean(row.is_limited ?? row.isLimitedDrop),
-    showInAnnouncementBar: Boolean(row.show_in_announcement_bar ?? row.showInAnnouncementBar),
+    isLimitedDrop: Boolean(row.is_limited ?? row.isLimitedDrop ?? row.is_drop ?? row.isDrop),
+    isCore: Boolean(row.is_core ?? row.isCore ?? String(row.collection || '').toLowerCase() === 'core'),
+    coreLabel: row.core_label || row.coreLabel || '',
+    corePriority: Number(row.core_priority ?? row.corePriority ?? 0),
+    isPromotion: Boolean(row.is_promotion ?? row.isPromotion),
+    promotionLabel: row.promotion_label || row.promotionLabel || '',
+    promotionText: row.promotion_text || row.promotionText || '',
+    promotionPriority: Number(row.promotion_priority ?? row.promotionPriority ?? 0),
+    isDrop: Boolean(row.is_drop ?? row.isDrop ?? row.is_limited ?? row.isLimitedDrop),
+    dropName: row.drop_name || row.dropName || '',
+    dropLabel: row.drop_label || row.dropLabel || '',
+    dropStartAt: row.drop_start_at || row.dropStartAt || undefined,
+    dropEndAt: row.drop_end_at || row.dropEndAt || undefined,
+    dropPriority: Number(row.drop_priority ?? row.dropPriority ?? 0),
+    showInAnnouncementBar: Boolean(row.show_in_announcement_bar ?? row.showInAnnouncementBar ?? row.is_promotion ?? row.isPromotion),
     announcementText: row.announcement_text || row.announcementText || '',
     marketingPriority: Number(row.marketing_priority ?? row.marketingPriority ?? 0),
     rating: Number(row.rating || 0),
@@ -92,14 +113,17 @@ function rowToProduct(row: Record<string, any>): Product {
 }
 
 function productToRow(product: Partial<Product>): Record<string, any> {
+  const targetAudience = product.targetAudience || product.gender || product.category;
+  const storefrontCategory = targetAudience === 'men' || targetAudience === 'women' ? targetAudience : (product.category || 'unisex');
   return {
     name_en: product.name,
     slug: product.slug,
     sku: product.sku,
     description_en: product.description,
     short_description_en: product.shortDescription,
-    gender: product.gender || product.category,
-    category: product.category,
+    target_audience: targetAudience,
+    gender: storefrontCategory,
+    category: storefrontCategory,
     price: product.price,
     compare_at_price: product.compareAtPrice,
     stock_total: product.sizes?.reduce((sum, s) => sum + Number(s.stock || 0), 0),
@@ -108,14 +132,27 @@ function productToRow(product: Partial<Product>): Record<string, any> {
     colors: product.colors,
     images: product.images?.map((url) => ({ url, public_url: url, source: 'supabase_storage' })),
     status: product.status,
-    is_limited: product.isLimitedDrop,
+    is_limited: product.isLimitedDrop || product.isDrop,
+    is_drop: product.isDrop || product.isLimitedDrop,
     drop_id: product.dropId,
+    drop_name: product.dropName,
+    drop_label: product.dropLabel,
+    drop_start_at: toIso(product.dropStartAt),
+    drop_end_at: toIso(product.dropEndAt),
+    drop_priority: product.dropPriority,
+    is_core: product.isCore,
+    core_label: product.coreLabel,
+    core_priority: product.corePriority,
+    is_promotion: product.isPromotion,
+    promotion_label: product.promotionLabel,
+    promotion_text: product.promotionText,
+    promotion_priority: product.promotionPriority,
     featured: product.isFeatured,
     best_seller: product.isBestSeller,
     new_arrival: product.isNewArrival,
     show_in_announcement_bar: product.showInAnnouncementBar,
-    announcement_text: product.announcementText,
-    marketing_priority: product.marketingPriority,
+    announcement_text: product.announcementText || product.promotionText,
+    marketing_priority: product.marketingPriority ?? product.promotionPriority ?? product.dropPriority ?? product.corePriority,
     material_en: product.materials?.join(', '),
     fit_en: product.fit,
     care_en: product.careInstructions,
@@ -414,11 +451,17 @@ function studioHeadersPayload<T extends Record<string, unknown>>(action: string,
 export async function getProducts(filters?: { category?: string; isFeatured?: boolean; isNewArrival?: boolean; isBestSeller?: boolean; isLimitedDrop?: boolean; includeHidden?: boolean }): Promise<Product[]> {
   let q = supabase.from('products').select('*').order('created_at', { ascending: false });
   if (!filters?.includeHidden) q = q.in('status', ['active', 'sold_out']);
-  if (filters?.category) q = q.eq('gender', filters.category);
+  if (filters?.category) {
+    const category = String(filters.category).toLowerCase();
+    if (category === 'men') q = q.in('gender', ['men', 'unisex']);
+    else if (category === 'women') q = q.in('gender', ['women', 'unisex']);
+    else if (category === 'unisex') q = q.eq('gender', 'unisex');
+    else q = q.eq('gender', category);
+  }
   if (filters?.isFeatured) q = q.eq('featured', true);
   if (filters?.isNewArrival) q = q.eq('new_arrival', true);
   if (filters?.isBestSeller) q = q.eq('best_seller', true);
-  if (filters?.isLimitedDrop) q = q.eq('is_limited', true);
+  if (filters?.isLimitedDrop) q = q.or('is_limited.eq.true,is_drop.eq.true');
   const { data, error } = await q;
   if (error) throw error;
   return (data || []).map(rowToProduct);

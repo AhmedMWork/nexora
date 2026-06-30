@@ -27,8 +27,8 @@ const faq = {
   ar: [
     ['مدة الشحن قد إيه؟', 'الشحن عادةً خلال 3 إلى 7 أيام عمل حسب المحافظة وضغط الطلبات.'],
     ['هل الدفع عند الاستلام متاح؟', 'نعم، الدفع حاليًا عند الاستلام فقط، وتدفع عند وصول الطلب.'],
-    ['هل أقدر أرجع المنتج؟', 'يمكن طلب الاسترجاع خلال 14 يومًا بشرط أن يكون المنتج غير مستخدم وبنفس حالته الأصلية وبالتغليف إن وجد.'],
-    ['مين يتحمل شحن الاسترجاع؟', 'العميل يتحمل تكلفة شحن الاسترجاع إلا إذا كان الخطأ من طرف NEXORA.'],
+    ['هل أقدر أرجع المنتج؟', 'المعاينة متاحة وقت الاستلام أثناء وجود مندوب الشحن. إذا المنتج غير مناسب أو المقاس غير مضبوط يمكن استرجاعه فورًا قبل مغادرة المندوب.'],
+    ['متى لا يُقبل الاسترجاع؟', 'بعد مغادرة مندوب الشحن لا يُقبل الاسترجاع إلا في حالة وجود عيب تصنيع أو مشكلة من طرف NEXORA.'],
     ['إزاي أختار المقاس المناسب؟', 'كل منتج يظهر المقاسات المتاحة والمخزون. لو محتار في المقاس، تواصل معنا على واتساب قبل الطلب.'],
     ['هل أقدر أعدل الطلب بعد التأكيد؟', 'تواصل معنا بسرعة عبر واتساب. إذا لم يبدأ تجهيز الطلب سنساعدك في التعديل.'],
   ],
@@ -110,8 +110,8 @@ export default function InfoPage() {
           {safeSlug === 'shipping-returns' && (
             <section className="mt-12 grid gap-4 md:grid-cols-3">
               {(lang === 'ar'
-                ? [['مدة الشحن', 'من 3 إلى 7 أيام عمل حسب المحافظة.'], ['الاسترجاع', 'خلال 14 يومًا بشرط الحالة الأصلية.'], ['تكلفة الاسترجاع', 'يتحملها العميل إلا إذا كان الخطأ من طرفنا.']]
-                : [['Delivery Time', '3 to 7 business days depending on the governorate.'], ['Returns', 'Within 14 days when the item remains in original condition.'], ['Return Shipping', 'Covered by the customer unless the issue was caused by us.']]
+                ? [['مدة الشحن', 'من 3 إلى 7 أيام عمل حسب المحافظة.'], ['المعاينة عند الاستلام', 'يمكنك فحص المنتج والمقاس أثناء وجود مندوب الشحن.'], ['الاسترجاع الفوري', 'إذا المنتج غير مناسب، يتم رفضه أو استرجاعه فورًا قبل مغادرة المندوب.']]
+                : [['Delivery Time', '3 to 7 business days depending on the governorate.'], ['Preview on Delivery', 'Inspect the item while the courier is still present.'], ['Immediate Return', 'If the item or size is not suitable, return it before the courier leaves.']]
               ).map(([label, text]) => (
                 <div key={label} className="rounded-[24px] border border-[var(--v33-border)] bg-[var(--v33-card)] p-5">
                   <h3 className="text-sm font-semibold text-[var(--v33-text)]">{label}</h3>

@@ -14,7 +14,15 @@ export default function LimitedDropsSection() {
   const [drops, setDrops] = useState<Product[]>([]);
 
   useEffect(() => {
-    loadProducts({ isLimitedDrop: true }).then((items) => setDrops(items.filter((product) => product.isLimitedDrop).slice(0, 3)));
+    loadProducts({ isLimitedDrop: true }).then((items) => {
+      const now = Date.now();
+      setDrops(items.filter((product) => {
+        if (!(product.isDrop || product.isLimitedDrop)) return false;
+        const start = product.dropStartAt ? new Date(product.dropStartAt).getTime() : 0;
+        const end = product.dropEndAt ? new Date(product.dropEndAt).getTime() : Infinity;
+        return now >= start && now <= end;
+      }).slice(0, 3));
+    });
   }, []);
 
   return (

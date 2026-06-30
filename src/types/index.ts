@@ -4,6 +4,7 @@
 
 export type ProductStatus = 'draft' | 'active' | 'hidden' | 'archived' | 'sold_out';
 export type ProductVisibility = 'public' | 'private' | 'scheduled';
+export type ProductAudience = 'men' | 'women' | 'unisex' | 'all';
 
 
 export interface ProductVariant {
@@ -46,6 +47,7 @@ export interface Product {
   costPrice?: number;
   category: 'men' | 'women' | 'unisex';
   gender?: 'men' | 'women' | 'unisex';
+  targetAudience?: ProductAudience;
   collection: string;
   dropId?: string;
   images: string[];
@@ -64,6 +66,19 @@ export interface Product {
   isNewArrival: boolean;
   isBestSeller: boolean;
   isLimitedDrop: boolean;
+  isCore?: boolean;
+  coreLabel?: string;
+  corePriority?: number;
+  isPromotion?: boolean;
+  promotionLabel?: string;
+  promotionText?: string;
+  promotionPriority?: number;
+  isDrop?: boolean;
+  dropName?: string;
+  dropLabel?: string;
+  dropStartAt?: Date | string;
+  dropEndAt?: Date | string;
+  dropPriority?: number;
   showInAnnouncementBar?: boolean;
   announcementText?: string;
   marketingPriority?: number;

@@ -32,6 +32,15 @@ function isDropLive(drop: Drop) {
   return now >= start && now <= end;
 }
 
+function isProductDropLive(product: Product) {
+  if (product.status && !['active', 'sold_out'].includes(product.status)) return false;
+  if (!(product.isDrop || product.isLimitedDrop)) return false;
+  const now = Date.now();
+  const start = toMillis(product.dropStartAt, 0);
+  const end = toMillis(product.dropEndAt, Infinity);
+  return now >= start && now <= end;
+}
+
 export default function DropsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [liveDrops, setLiveDrops] = useState<Drop[]>([]);
@@ -49,10 +58,9 @@ export default function DropsPage() {
         const liveDropIds = new Set(live.map((d) => d.id));
         const liveProductIds = new Set(live.flatMap((d) => d.productIds || []));
         const filtered = items.filter((p) => {
-          if (p.status && !['active', 'sold_out'].includes(p.status)) return false;
-          if (!p.isLimitedDrop) return false;
+          if (isProductDropLive(p)) return true;
           if (live.length === 0) return false;
-          return (p.dropId && liveDropIds.has(p.dropId)) || liveProductIds.has(p.id) || liveProductIds.has(p.slug);
+          return Boolean((p.dropId && liveDropIds.has(p.dropId)) || liveProductIds.has(p.id) || liveProductIds.has(p.slug));
         });
         setLiveDrops(live);
         setScheduledDrops(scheduled);
@@ -89,7 +97,7 @@ export default function DropsPage() {
                 <span className="v3-kicker">Selected windows only</span>
               </div>
               <h1 className="v3-title max-w-3xl">Limited releases, never permanent.</h1>
-              <p className="v3-lead mt-6">NEXORA limited pieces are available only while a live release is open. Once the release ends, the pieces leave the regular store.</p>
+              <p className="v3-lead mt-6">NEXORA limited pieces now live directly on products. Mark any product as a Drop in Products HQ and it appears here during its selected window.</p>
               <div className="mt-8 flex flex-col sm:flex-row gap-3">
                 <Link to="/shop" className="v3-btn-primary">Shop Core Essentials <ArrowRight className="h-4 w-4" /></Link>
                 <Link to="/shop/unisex" className="v3-btn-secondary">Explore Unisex</Link>

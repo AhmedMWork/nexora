@@ -220,7 +220,7 @@ const ar: Dictionary = {
   'info.about.title': 'عن NEXORA',
   'info.about.body': 'NEXORA exists in silence.\n\nDefined by intention.\nCrafted with precision.\nWe don’t chase attention.\nWe command presence.\nLimited by design.\nNot for everyone.',
   'info.shipping.title': 'الشحن والاسترجاع',
-  'info.shipping.body': 'الشحن خلال 3 إلى 7 أيام عمل حسب المحافظة. يمكن طلب الاسترجاع خلال 14 يومًا من استلام الطلب بشرط أن يكون المنتج غير مستخدم وبنفس حالته الأصلية. يتحمل العميل تكلفة شحن الاسترجاع ما لم يكن الخطأ من طرف NEXORA.',
+  'info.shipping.body': 'الشحن خلال 3 إلى 7 أيام عمل حسب المحافظة. المعاينة متاحة عند الاستلام أثناء وجود مندوب الشحن؛ إذا المنتج غير مناسب أو المقاس غير مضبوط يمكن استرجاعه فورًا قبل مغادرة المندوب.',
   'info.faq.title': 'الأسئلة الشائعة',
   'info.faq.body': 'إجابات واضحة عن الشحن والدفع عند الاستلام والاسترجاع وتأكيد الطلب واختيار المقاس ومنتجات NEXORA.',
   'info.privacy.title': 'سياسة الخصوصية',

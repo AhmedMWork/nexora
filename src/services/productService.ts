@@ -13,13 +13,22 @@ export function seedProductsAsProducts(): Product[] {
   }));
 }
 
+function productMatchesCategory(product: Product, category?: string) {
+  if (!category) return true;
+  const audience = product.targetAudience || product.gender || product.category;
+  if (category === 'men') return audience === 'men' || audience === 'unisex' || audience === 'all';
+  if (category === 'women') return audience === 'women' || audience === 'unisex' || audience === 'all';
+  if (category === 'unisex') return audience === 'unisex' || audience === 'all';
+  return product.category === category || audience === category;
+}
+
 function applyLocalFilters(products: Product[], filters?: Parameters<typeof getSupabaseProducts>[0]): Product[] {
   return products.filter((product) => {
-    if (filters?.category && product.category !== filters.category) return false;
+    if (!productMatchesCategory(product, filters?.category)) return false;
     if (filters?.isFeatured && !product.isFeatured) return false;
     if (filters?.isNewArrival && !product.isNewArrival) return false;
     if (filters?.isBestSeller && !product.isBestSeller) return false;
-    if (filters?.isLimitedDrop && !product.isLimitedDrop) return false;
+    if (filters?.isLimitedDrop && !(product.isLimitedDrop || product.isDrop)) return false;
     return true;
   });
 }

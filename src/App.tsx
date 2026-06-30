@@ -37,7 +37,6 @@ const AdminOrderDetail = lazy(() => import('@/pages/admin/AdminOrderDetail'));
 const AdminInventory = lazy(() => import('@/pages/admin/AdminInventory'));
 const AdminReviews = lazy(() => import('@/pages/admin/AdminReviews'));
 const AdminCoupons = lazy(() => import('@/pages/admin/AdminCoupons'));
-const AdminDrops = lazy(() => import('@/pages/admin/AdminDrops'));
 const AdminAnalytics = lazy(() => import('@/pages/admin/AdminAnalytics'));
 const AdminCustomers = lazy(() => import('@/pages/admin/AdminCustomers'));
 const AdminVisitors = lazy(() => import('@/pages/admin/AdminVisitors'));
@@ -45,7 +44,6 @@ const AdminLeads = lazy(() => import('@/pages/admin/AdminLeads'));
 const AdminCampaigns = lazy(() => import('@/pages/admin/AdminCampaigns'));
 const AdminReports = lazy(() => import('@/pages/admin/AdminReports'));
 const AdminSEO = lazy(() => import('@/pages/admin/AdminSEO'));
-const AdminPromotions = lazy(() => import('@/pages/admin/AdminPromotions'));
 const AdminStorefront = lazy(() => import('@/pages/admin/AdminStorefront'));
 const AdminShipping = lazy(() => import('@/pages/admin/AdminShipping'));
 const AdminWorkflow = lazy(() => import('@/pages/admin/AdminWorkflow'));
@@ -152,7 +150,7 @@ function AdminRoutes() {
             <Route path="/users-roles" element={<PageTransition><AdminUsersRoles /></PageTransition>} />
             <Route path="/reviews" element={<PageTransition><AdminReviews /></PageTransition>} />
             <Route path="/coupons" element={<PageTransition><AdminCoupons /></PageTransition>} />
-            <Route path="/drops" element={<PageTransition><AdminDrops /></PageTransition>} />
+            <Route path="/drops" element={<Navigate to="/nexora-admin/products" replace />} />
             <Route path="/analytics" element={<PageTransition><AdminAnalytics /></PageTransition>} />
             <Route path="/customers" element={<PageTransition><AdminCustomers /></PageTransition>} />
             <Route path="/visitors" element={<PageTransition><AdminVisitors /></PageTransition>} />
@@ -163,7 +161,7 @@ function AdminRoutes() {
             <Route path="/settings" element={<Navigate to="/nexora-admin/controls" replace />} />
             <Route path="/system-health" element={<Navigate to="/nexora-admin/controls" replace />} />
             <Route path="/audit-logs" element={<Navigate to="/nexora-admin/dashboard" replace />} />
-            <Route path="/promotions" element={<PageTransition><AdminPromotions /></PageTransition>} />
+            <Route path="/promotions" element={<Navigate to="/nexora-admin/products" replace />} />
             <Route path="*" element={<Navigate to="/nexora-admin/dashboard" replace />} />
           </Routes>
         </AnimatePresence>

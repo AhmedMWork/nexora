@@ -18,6 +18,8 @@ import {
   X,
   ZoomIn,
   Send,
+  PackageCheck,
+  Ruler,
 } from 'lucide-react';
 import { useWishlistStore } from '@/stores/wishlistStore';
 import { useCartStore } from '@/stores/cartStore';
@@ -441,9 +443,24 @@ export default function ProductDetailPage() {
                   <span className="text-xs text-[#b8b0a3]">{averageRating} ({reviewCount} reviews)</span>
                 </div>
 
-                <div className="flex items-center gap-3 mb-8 pb-8 border-b border-[#17171a]">
+                <div className="flex items-center gap-3 mb-5 pb-5 border-b border-[#17171a]">
                   <span className={`text-3xl font-bold ${discount > 0 ? 'nexora-sale-price' : 'text-[#f4f0e8]'}`}>{formatPrice(product.price)}</span>
                   {product.compareAtPrice && <span className="text-lg text-[#8a8175] line-through">{formatPrice(product.compareAtPrice)}</span>}
+                </div>
+
+                <div className="mb-6 rounded-[26px] border border-[#202024] bg-[#0b0b0d]/72 p-4 sm:p-5">
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#c8a96a]">Product details before size</p>
+                  <p className="mt-3 text-sm leading-7 text-[#d8cec2]">{product.shortDescription || product.description}</p>
+                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                    <div className="rounded-2xl border border-[#17171a] bg-[#050505]/70 p-3">
+                      <p className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.16em] text-[#f4f0e8]"><Ruler className="h-3.5 w-3.5 text-[#c8a96a]" /> Fit</p>
+                      <p className="mt-2 text-xs leading-5 text-[#8a8175]">{product.fit || 'Structured relaxed fit with quiet presence.'}</p>
+                    </div>
+                    <div className="rounded-2xl border border-[#17171a] bg-[#050505]/70 p-3">
+                      <p className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.16em] text-[#f4f0e8]"><PackageCheck className="h-3.5 w-3.5 text-[#c8a96a]" /> Preview on delivery</p>
+                      <p className="mt-2 text-xs leading-5 text-[#8a8175]">You can inspect the piece while the courier is present. If the size is not right or you do not like it, return it immediately before the courier leaves.</p>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="mb-6">
@@ -535,9 +552,9 @@ export default function ProductDetailPage() {
             )}
 
             {activeTab === 'shipping' && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-3xl"><div className="space-y-4">{[
-              ['Delivery', `Shipping duration: ${SHIPPING_ESTIMATE_TEXT}`],
-              ['Payment', `Cash on Delivery, Instapay, Vodafone Cash and ValU installments are available. Manual transfers are confirmed by screenshot on WhatsApp, while ValU is confirmed by the NEXORA team before preparation.`],
-              ['Returns & Exchange', RETURN_EXCHANGE_POLICY_AR.join(' ')]
+              ['Delivery', `Shipping duration: ${SHIPPING_ESTIMATE_TEXT}. Preview on delivery is available while the courier is present.`],
+              ['Payment', `Cash on Delivery, Instapay, Vodafone Cash and ValU installments are available. For COD, you can inspect the item with the courier before accepting it. Manual transfers are confirmed by screenshot on WhatsApp, while ValU is confirmed by the NEXORA team before preparation.`],
+              ['Preview, Returns & Exchange', RETURN_EXCHANGE_POLICY_AR.join(' ')]
             ].map(([title, body]) => <div key={title} className="p-4 bg-[#0b0b0d] border border-[#17171a]"><h4 className="text-xs font-bold tracking-wider uppercase text-[#f4f0e8] mb-2">{title}</h4><p className="text-xs text-[#b8b0a3] leading-relaxed">{body}</p></div>)}<div className="rounded-3xl border border-[#202024] bg-[#0b0b0d] p-5"><h4 className="text-xs font-bold tracking-wider uppercase text-[#f4f0e8] mb-3">سياسة الاسترجاع والاستبدال</h4><ul className="space-y-2 text-sm leading-6 text-[#b8b0a3] rtl:text-right">{RETURN_EXCHANGE_POLICY_AR.map((item) => <li key={item}>• {item}</li>)}</ul><p className="mt-4 text-xs font-semibold text-[#c8a96a]">مدة الشحن: {SHIPPING_ESTIMATE_TEXT_AR}</p></div></div></motion.div>}
 
             {activeTab === 'reviews' && (

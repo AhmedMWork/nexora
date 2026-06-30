@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Edit, Eye, GripVertical, Plus, RefreshCw, Trash2, Upload, X, Star as StarIcon, Download, Layers3 } from 'lucide-react';
+import { CalendarClock, Edit, Eye, GripVertical, Plus, RefreshCw, Trash2, Upload, X, Star as StarIcon, Download, Layers3, BadgePercent } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { PRODUCT_COLORS, PRODUCT_SIZES } from '@/lib/constants';
 import { colorToStorage, normalizeColors } from '@/lib/productOptions';
@@ -9,12 +9,13 @@ import { uploadProductImage } from '@/services/upload.service';
 import type { Product, ProductColor } from '@/types';
 
 type ProductFormMode = 'list' | 'create' | 'edit';
-type CategoryChoice = 'men' | 'women' | 'unisex' | 'custom';
+type CategoryChoice = 'men' | 'women' | 'unisex' | 'all' | 'custom';
 
 type ProductDraft = {
   name: string;
   slug: string;
   description: string;
+  shortDescription: string;
   price: number;
   compareAtPrice?: number;
   category: CategoryChoice;
@@ -33,6 +34,19 @@ type ProductDraft = {
   isNewArrival: boolean;
   isBestSeller: boolean;
   isLimitedDrop: boolean;
+  isCore: boolean;
+  coreLabel: string;
+  corePriority: number;
+  isPromotion: boolean;
+  promotionLabel: string;
+  promotionText: string;
+  promotionPriority: number;
+  isDrop: boolean;
+  dropName: string;
+  dropLabel: string;
+  dropStartAt: string;
+  dropEndAt: string;
+  dropPriority: number;
   showInAnnouncementBar: boolean;
   announcementText: string;
   marketingPriority: number;
@@ -49,6 +63,7 @@ const emptyDraft: ProductDraft = {
   name: '',
   slug: '',
   description: '',
+  shortDescription: '',
   price: 0,
   category: 'unisex',
   customCategory: '',
@@ -66,6 +81,19 @@ const emptyDraft: ProductDraft = {
   isNewArrival: true,
   isBestSeller: false,
   isLimitedDrop: false,
+  isCore: true,
+  coreLabel: 'Core Essential',
+  corePriority: 0,
+  isPromotion: false,
+  promotionLabel: 'Special Offer',
+  promotionText: '',
+  promotionPriority: 0,
+  isDrop: false,
+  dropName: '',
+  dropLabel: 'Limited Drop',
+  dropStartAt: '',
+  dropEndAt: '',
+  dropPriority: 0,
   showInAnnouncementBar: false,
   announcementText: '',
   marketingPriority: 0,
@@ -79,7 +107,9 @@ const flagFields = [
   ['isFeatured', 'Featured', 'Show on the homepage featured products section.'],
   ['isNewArrival', 'New Arrival', 'Mark as a new product.'],
   ['isBestSeller', 'Best Seller', 'Use for products you want to highlight as best sellers.'],
-  ['isLimitedDrop', 'Limited Drop', 'Use only for pieces connected to a live limited release.'],
+  ['isCore', 'Core', 'Mark as a core evergreen product. This now saves as a dedicated field, not only as collection text.'],
+  ['isPromotion', 'Promotion', 'Use this product itself as the promotion source instead of managing a separate Promotions page.'],
+  ['isDrop', 'Drop', 'Use this product itself as a limited drop source instead of managing a separate Drops page.'],
 ] as const;
 
 function Field({ label, help, children }: { label: string; help: string; children: React.ReactNode }) {
@@ -161,9 +191,10 @@ export default function AdminProducts() {
       name: product.name,
       slug: product.slug,
       description: product.description,
+      shortDescription: product.shortDescription || '',
       price: product.price,
       compareAtPrice: product.compareAtPrice,
-      category: product.category,
+      category: (product.targetAudience || product.gender || product.category || 'unisex') as CategoryChoice,
       customCategory: '',
       productType: product.tags.find((tag) => productTypes.includes(tag)) || 'T-Shirts',
       collection: product.collection || 'core',
@@ -178,7 +209,20 @@ export default function AdminProducts() {
       isFeatured: product.isFeatured,
       isNewArrival: product.isNewArrival,
       isBestSeller: product.isBestSeller,
-      isLimitedDrop: product.isLimitedDrop,
+      isLimitedDrop: product.isLimitedDrop || Boolean(product.isDrop),
+      isCore: Boolean(product.isCore ?? String(product.collection || '').toLowerCase() === 'core'),
+      coreLabel: product.coreLabel || 'Core Essential',
+      corePriority: Number(product.corePriority || 0),
+      isPromotion: Boolean(product.isPromotion),
+      promotionLabel: product.promotionLabel || 'Special Offer',
+      promotionText: product.promotionText || '',
+      promotionPriority: Number(product.promotionPriority || 0),
+      isDrop: Boolean(product.isDrop || product.isLimitedDrop),
+      dropName: product.dropName || '',
+      dropLabel: product.dropLabel || 'Limited Drop',
+      dropStartAt: product.dropStartAt ? new Date(product.dropStartAt).toISOString().slice(0, 16) : '',
+      dropEndAt: product.dropEndAt ? new Date(product.dropEndAt).toISOString().slice(0, 16) : '',
+      dropPriority: Number(product.dropPriority || 0),
       showInAnnouncementBar: Boolean(product.showInAnnouncementBar),
       announcementText: product.announcementText || '',
       marketingPriority: Number(product.marketingPriority || 0),
@@ -227,17 +271,19 @@ export default function AdminProducts() {
       .filter(([, stock]) => Number(stock) >= 0)
       .map(([size, stock]) => ({ size, stock: Number(stock), lowStockThreshold: 3 }));
 
-    const category = draft.category === 'custom' ? 'unisex' : draft.category;
+    const category = draft.category === 'custom' || draft.category === 'all' ? 'unisex' : draft.category;
     const customTags = draft.tags.split(',').map((v) => v.trim()).filter(Boolean);
     const payload = {
       name: draft.name.trim(),
       slug: draft.slug || generateSlug(draft.name),
       description: draft.description || `${draft.name} by NEXORA.`,
+      shortDescription: draft.shortDescription || draft.description.slice(0, 160),
       price: Number(draft.price),
       compareAtPrice: draft.compareAtPrice ? Number(draft.compareAtPrice) : undefined,
       category,
       gender: category,
-      collection: draft.category === 'custom' && draft.customCategory ? draft.customCategory : draft.collection || 'core',
+      targetAudience: draft.category === 'custom' ? 'unisex' : draft.category,
+      collection: draft.category === 'custom' && draft.customCategory ? draft.customCategory : draft.collection || (draft.isCore ? 'core' : 'seasonal'),
       images: imageList,
       thumbnail: imageList[0],
       sizes: sizeRows,
@@ -248,10 +294,23 @@ export default function AdminProducts() {
       isFeatured: draft.isFeatured,
       isNewArrival: draft.isNewArrival,
       isBestSeller: draft.isBestSeller,
-      isLimitedDrop: draft.isLimitedDrop,
-      showInAnnouncementBar: draft.showInAnnouncementBar,
-      announcementText: draft.announcementText.trim(),
-      marketingPriority: Number(draft.marketingPriority || 0),
+      isLimitedDrop: draft.isLimitedDrop || draft.isDrop,
+      isCore: draft.isCore,
+      coreLabel: draft.coreLabel.trim(),
+      corePriority: Number(draft.corePriority || 0),
+      isPromotion: draft.isPromotion,
+      promotionLabel: draft.promotionLabel.trim(),
+      promotionText: draft.promotionText.trim(),
+      promotionPriority: Number(draft.promotionPriority || 0),
+      isDrop: draft.isDrop || draft.isLimitedDrop,
+      dropName: draft.dropName.trim(),
+      dropLabel: draft.dropLabel.trim(),
+      dropStartAt: draft.dropStartAt || undefined,
+      dropEndAt: draft.dropEndAt || undefined,
+      dropPriority: Number(draft.dropPriority || 0),
+      showInAnnouncementBar: draft.showInAnnouncementBar || draft.isPromotion || draft.isDrop,
+      announcementText: (draft.announcementText || draft.promotionText || draft.dropLabel).trim(),
+      marketingPriority: Number(draft.marketingPriority || draft.promotionPriority || draft.dropPriority || draft.corePriority || 0),
       status: draft.status,
       visibility: draft.status === 'active' ? ('public' as const) : ('private' as const),
       fit: draft.fit,
@@ -332,7 +391,7 @@ export default function AdminProducts() {
           <div className="studio-card overflow-x-auto">
             <table className="w-full min-w-[820px] text-left">
               <thead><tr className="border-b border-[#4A3D37]">
-                {['Image', 'Name', 'SKU', 'Price', 'Stock', 'Category', 'Actions'].map((h) => <th key={h} className="p-4 text-[10px] font-bold uppercase tracking-wider text-[#BCAEA0]">{h}</th>)}
+                {['Image', 'Name', 'SKU', 'Price', 'Stock', 'Audience / Marketing', 'Actions'].map((h) => <th key={h} className="p-4 text-[10px] font-bold uppercase tracking-wider text-[#BCAEA0]">{h}</th>)}
               </tr></thead>
               <tbody>
                 {isLoading ? <tr><td colSpan={7} className="p-8 text-center text-sm text-[#BCAEA0]">Loading products...</td></tr> : filteredProducts.map((product) => {
@@ -343,7 +402,7 @@ export default function AdminProducts() {
                     <td className="p-4 text-xs text-[#BCAEA0]">{product.sku}</td>
                     <td className="p-4 text-xs font-semibold text-[#D2B48C]">{formatPrice(product.price)}</td>
                     <td className="p-4 text-xs text-[#BCAEA0]">{totalStock} units{product.sizes.some((size) => size.stock <= size.lowStockThreshold) && <p className="mt-1 text-[10px] text-amber-300">Low stock size</p>}</td>
-                    <td className="p-4 text-xs text-[#BCAEA0]">{product.category}</td>
+                    <td className="p-4 text-xs text-[#BCAEA0]"><span className="font-semibold text-[#FFF0E1]">{product.targetAudience || product.category}</span><div className="mt-2 flex flex-wrap gap-1">{product.isCore && <span className="rounded-full border border-[#D2B48C]/30 px-2 py-0.5 text-[9px] text-[#D2B48C]">Core</span>}{product.isPromotion && <span className="rounded-full border border-emerald-300/30 px-2 py-0.5 text-[9px] text-emerald-200">Promo</span>}{(product.isDrop || product.isLimitedDrop) && <span className="rounded-full border border-amber-300/30 px-2 py-0.5 text-[9px] text-amber-200">Drop</span>}{product.showInAnnouncementBar && <span className="rounded-full border border-sky-300/30 px-2 py-0.5 text-[9px] text-sky-200">Bar</span>}</div></td>
                     <td className="p-4"><div className="flex gap-2"><button onClick={() => openEdit(product)} className="text-[#BCAEA0] hover:text-[#D2B48C]"><Edit className="h-4 w-4" /></button><Link to={`/nexora-admin/reviews?productId=${product.id}`} className="text-[#BCAEA0] hover:text-[#D2B48C]" title="Manage product reviews"><StarIcon className="h-4 w-4" /></Link><button onClick={() => handleDelete(product.id)} className="text-[#BCAEA0] hover:text-red-300"><Trash2 className="h-4 w-4" /></button></div></td>
                   </tr>;
                 })}
@@ -368,10 +427,11 @@ export default function AdminProducts() {
             <Field label="Slug" help="Leave empty to auto-generate. Used in the product page URL."><input value={draft.slug} onChange={(e) => updateDraft('slug', e.target.value)} className="studio-input" placeholder="auto if empty" /></Field>
             <Field label="Price EGP" help="Selling price in Egyptian pounds. Example: 499."><input type="number" value={draft.price} onChange={(e) => updateDraft('price', Number(e.target.value))} className="studio-input" /></Field>
             <Field label="Compare-at price" help="Optional old price shown crossed out. Leave empty if not needed."><input type="number" value={draft.compareAtPrice || ''} onChange={(e) => updateDraft('compareAtPrice', e.target.value ? Number(e.target.value) : undefined)} className="studio-input" /></Field>
-            <Field label="Gender" help="Most products should be Men, Women, or Unisex. Use Custom only for special collections."><select value={draft.category} onChange={(e) => updateDraft('category', e.target.value as CategoryChoice)} className="studio-input"><option value="men">Men</option><option value="women">Women</option><option value="unisex">Unisex</option><option value="custom">Custom</option></select></Field>
+            <Field label="Target audience" help="Choose Unisex or All once and it will automatically appear in both Men and Women storefront pages."><select value={draft.category} onChange={(e) => updateDraft('category', e.target.value as CategoryChoice)} className="studio-input"><option value="men">Men only</option><option value="women">Women only</option><option value="unisex">Unisex — show in Men and Women</option><option value="all">All audiences — show everywhere relevant</option><option value="custom">Custom/internal</option></select></Field>
             <Field label="Product type" help="Choose a type to keep the catalog organized."><select value={draft.productType} onChange={(e) => updateDraft('productType', e.target.value)} className="studio-input">{productTypes.map((type) => <option key={type}>{type}</option>)}</select></Field>
             {draft.category === 'custom' && <Field label="Custom category" help="Used internally if the product does not fit Men/Women/Unisex."><input value={draft.customCategory} onChange={(e) => updateDraft('customCategory', e.target.value)} className="studio-input" /></Field>}
             <Field label="SKU" help="Internal stock code. Example: NXR-TEE-001."><input value={draft.sku} onChange={(e) => updateDraft('sku', e.target.value)} className="studio-input" /></Field>
+            <Field label="Short description" help="This appears near the price before size selection, so customers understand the product before choosing a size."><input value={draft.shortDescription} onChange={(e) => updateDraft('shortDescription', e.target.value)} className="studio-input" placeholder="Premium oversized cotton tee with a relaxed structured fit." /></Field>
             <Field label="Collection" help="Internal collection name like core, summer, or limited."><input value={draft.collection} onChange={(e) => updateDraft('collection', e.target.value)} className="studio-input" /></Field>
             <Field label="Fit" help="Choose the fit customers should expect."><select value={draft.fit} onChange={(e) => updateDraft('fit', e.target.value)} className="studio-input">{fitOptions.map((fit) => <option key={fit}>{fit}</option>)}</select></Field>
             <Field label="Materials" help="Separate materials with commas. Example: Premium cotton, soft rib."><input value={draft.materials} onChange={(e) => updateDraft('materials', e.target.value)} className="studio-input" /></Field>
@@ -472,40 +532,47 @@ export default function AdminProducts() {
               ))}
             </div>
 
-            <div className="mt-5 rounded-[24px] border border-[#5B473C] bg-[#17110F] p-4">
-              <label className="flex items-start gap-3 text-sm font-semibold text-[#FFF0E1]">
-                <input
-                  type="checkbox"
-                  checked={draft.showInAnnouncementBar}
-                  onChange={(e) => updateDraft('showInAnnouncementBar', e.target.checked)}
-                  className="mt-1"
-                />
-                <span>
-                  Show this product in the animated site bar
-                  <span className="mt-1 block text-xs font-normal leading-5 text-[#BCAEA0]">Only active products selected here will appear in the moving bar across the storefront.</span>
-                </span>
-              </label>
+            <div className="mt-5 grid gap-4 lg:grid-cols-3">
+              <Field label="Core label" help="Optional label for core products. Leave Core on when this is an evergreen piece.">
+                <input value={draft.coreLabel} onChange={(e) => updateDraft('coreLabel', e.target.value)} className="studio-input" placeholder="Core Essential" />
+              </Field>
+              <Field label="Promotion label" help="Shown in product badges and the animated bar when Promotion is active.">
+                <input value={draft.promotionLabel} onChange={(e) => updateDraft('promotionLabel', e.target.value)} className="studio-input" placeholder="Special Offer" />
+              </Field>
+              <Field label="Promotion priority" help="Higher priority appears first in marketing surfaces.">
+                <input type="number" value={draft.promotionPriority} onChange={(e) => updateDraft('promotionPriority', Number(e.target.value))} className="studio-input" />
+              </Field>
+            </div>
 
+            <div className="mt-5 rounded-[24px] border border-[#5B473C] bg-[#17110F] p-4">
+              <div className="mb-3 flex items-center gap-2 text-xs font-black uppercase tracking-[0.16em] text-[#D2B48C]"><BadgePercent className="h-4 w-4" /> Product as promotion</div>
+              <Field label="Promotion text" help="Use the product itself as the promotion. This also feeds the animated site bar when enabled.">
+                <input value={draft.promotionText} onChange={(e) => updateDraft('promotionText', e.target.value)} className="studio-input" placeholder="Limited pieces available now — preview on delivery." />
+              </Field>
+              <label className="mt-4 flex items-start gap-3 text-sm font-semibold text-[#FFF0E1]">
+                <input type="checkbox" checked={draft.showInAnnouncementBar || draft.isPromotion || draft.isDrop} onChange={(e) => updateDraft('showInAnnouncementBar', e.target.checked)} className="mt-1" />
+                <span>Show this product in the animated site bar<span className="mt-1 block text-xs font-normal leading-5 text-[#BCAEA0]">Only active selected products appear in the moving storefront bar. No separate Promotions page is required.</span></span>
+              </label>
               <div className="mt-4 grid gap-4 lg:grid-cols-[1fr_160px]">
-                <Field label="Bar message" help="Optional. Leave empty to auto-generate a clean message from the product name and selected badge.">
-                  <input
-                    value={draft.announcementText}
-                    onChange={(e) => updateDraft('announcementText', e.target.value)}
-                    className="studio-input"
-                    placeholder="Example: New drop just landed — limited quantities."
-                  />
+                <Field label="Bar message" help="Optional. Leave empty to use Promotion text, Drop label, or an automatic product message.">
+                  <input value={draft.announcementText} onChange={(e) => updateDraft('announcementText', e.target.value)} className="studio-input" placeholder="Example: New drop just landed — limited quantities." />
                 </Field>
-                <Field label="Priority" help="Higher numbers appear first in the moving bar.">
-                  <input
-                    type="number"
-                    value={draft.marketingPriority}
-                    onChange={(e) => updateDraft('marketingPriority', Number(e.target.value))}
-                    className="studio-input"
-                  />
+                <Field label="Bar priority" help="Higher numbers appear first in the moving bar.">
+                  <input type="number" value={draft.marketingPriority} onChange={(e) => updateDraft('marketingPriority', Number(e.target.value))} className="studio-input" />
                 </Field>
               </div>
             </div>
-          </div>
+
+            <div className="mt-5 rounded-[24px] border border-[#5B473C] bg-[#17110F] p-4">
+              <div className="mb-3 flex items-center gap-2 text-xs font-black uppercase tracking-[0.16em] text-[#D2B48C]"><CalendarClock className="h-4 w-4" /> Product as drop</div>
+              <div className="grid gap-4 lg:grid-cols-2">
+                <Field label="Drop name" help="Example: Summer Drop. Leave empty to use the product name."><input value={draft.dropName} onChange={(e) => updateDraft('dropName', e.target.value)} className="studio-input" /></Field>
+                <Field label="Drop label" help="Small storefront label. Example: Limited Drop."><input value={draft.dropLabel} onChange={(e) => updateDraft('dropLabel', e.target.value)} className="studio-input" /></Field>
+                <Field label="Drop start" help="Optional. Product is considered live after this date."><input type="datetime-local" value={draft.dropStartAt} onChange={(e) => updateDraft('dropStartAt', e.target.value)} className="studio-input" /></Field>
+                <Field label="Drop end" help="Optional. Product is hidden from limited surfaces after this date."><input type="datetime-local" value={draft.dropEndAt} onChange={(e) => updateDraft('dropEndAt', e.target.value)} className="studio-input" /></Field>
+                <Field label="Drop priority" help="Higher numbers appear first in drop surfaces."><input type="number" value={draft.dropPriority} onChange={(e) => updateDraft('dropPriority', Number(e.target.value))} className="studio-input" /></Field>
+              </div>
+            </div>          </div>
 
           <div className="flex flex-wrap gap-3">
             <button onClick={() => setMode('list')} className="nexora-button">Cancel</button>
