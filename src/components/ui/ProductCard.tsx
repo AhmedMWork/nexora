@@ -68,13 +68,17 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
       ? 'Sold Out'
       : isLowStock
         ? 'Low Stock'
-        : product.isLimitedDrop
-          ? 'Limited'
-          : product.isNewArrival
-            ? 'New'
-            : product.isBestSeller
-              ? 'Best Seller'
-              : null;
+        : (product.isDrop || product.isLimitedDrop)
+          ? (product.dropLabel || 'Limited')
+          : product.isPromotion
+            ? (product.promotionLabel || 'Offer')
+            : product.isNewArrival
+              ? 'New'
+              : product.isBestSeller
+                ? 'Best Seller'
+                : product.isCore
+                  ? (product.coreLabel || 'Core')
+                  : null;
 
   return (
     <motion.div
@@ -154,7 +158,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
 
         <div className="relative z-[2] p-4 sm:p-5">
           <p className="mb-2 text-[10px] uppercase tracking-[0.2em] text-[var(--v33-muted)]">
-            {product.category} · {product.collection}
+            {product.targetAudience || product.category} · {product.isCore ? (product.coreLabel || 'Core') : product.collection}
           </p>
           <h3 className="mb-3 line-clamp-1 text-sm font-bold text-[var(--v33-text)] transition-colors group-hover:text-[var(--v33-accent-strong)]">
             {product.name}

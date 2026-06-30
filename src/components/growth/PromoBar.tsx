@@ -16,7 +16,8 @@ function discountPercent(product: Product) {
 
 function marketingLabel(product: Product) {
   if (hasDiscount(product)) return 'Sale';
-  if (product.isLimitedDrop) return 'Limited';
+  if (product.isPromotion) return product.promotionLabel || 'Offer';
+  if (product.isDrop || product.isLimitedDrop) return product.dropLabel || 'Limited';
   if (product.isBestSeller) return 'Best Seller';
   if (product.isNewArrival) return 'New Arrival';
   if (product.isFeatured) return 'Featured';
@@ -29,7 +30,9 @@ function announcementCopy(product: Product) {
 
   const discount = discountPercent(product);
   if (discount > 0) return `${product.name} — ${discount}% off for a limited time`;
-  if (product.isLimitedDrop) return `${product.name} — available while stock lasts`;
+  if (product.promotionText) return product.promotionText;
+  if (product.isPromotion) return `${product.name} — ${product.promotionLabel || 'special offer'} available now`;
+  if (product.isDrop || product.isLimitedDrop) return `${product.dropName || product.name} — available while stock lasts`;
   if (product.isBestSeller) return `${product.name} — moving fast`;
   if (product.isNewArrival) return `${product.name} — just landed`;
   return `${product.name} — now available`;
@@ -37,7 +40,7 @@ function announcementCopy(product: Product) {
 
 function PromoIcon({ product }: { product: Product }) {
   if (hasDiscount(product)) return <Percent className="h-3 w-3 sm:h-3.5 sm:w-3.5" aria-hidden="true" />;
-  if (product.isLimitedDrop) return <Flame className="h-3 w-3 sm:h-3.5 sm:w-3.5" aria-hidden="true" />;
+  if (product.isDrop || product.isLimitedDrop) return <Flame className="h-3 w-3 sm:h-3.5 sm:w-3.5" aria-hidden="true" />;
   return <Sparkles className="h-3 w-3 sm:h-3.5 sm:w-3.5" aria-hidden="true" />;
 }
 
