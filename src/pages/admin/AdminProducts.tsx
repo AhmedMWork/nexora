@@ -6,6 +6,7 @@ import { PRODUCT_COLORS, PRODUCT_SIZES } from '@/lib/constants';
 import { colorToStorage, normalizeColors } from '@/lib/productOptions';
 import { formatPrice, generateSlug } from '@/lib/utils';
 import { uploadProductImage } from '@/services/upload.service';
+import { getCollectionDisplayLabel, productMatchesAudience } from '@/lib/productVisibility';
 import type { Product, ProductColor } from '@/types';
 
 type ProductFormMode = 'list' | 'create' | 'edit';
@@ -143,9 +144,10 @@ export default function AdminProducts() {
 
   const filteredProducts = useMemo(() => products.filter((p) => {
     const q = searchQuery.toLowerCase().trim();
+    const status = String(p.status || 'active').toLowerCase();
     const matchesSearch = !q || p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q) || p.slug.toLowerCase().includes(q);
-    const matchesStatus = statusFilter ? (p.status || 'active') === statusFilter : true;
-    const matchesCategory = categoryFilter ? ((audience) => categoryFilter === 'men' ? audience === 'men' || audience === 'unisex' || audience === 'all' : categoryFilter === 'women' ? audience === 'women' || audience === 'unisex' || audience === 'all' : categoryFilter === 'unisex' ? audience === 'unisex' || audience === 'all' : p.category === categoryFilter || audience === categoryFilter)(String(p.targetAudience || p.gender || p.category || '').toLowerCase()) : true;
+    const matchesStatus = statusFilter ? status === statusFilter : status !== 'archived';
+    const matchesCategory = categoryFilter ? productMatchesAudience(p, categoryFilter) : true;
     return matchesSearch && matchesStatus && matchesCategory;
   }), [products, searchQuery, statusFilter, categoryFilter]);
 
@@ -210,7 +212,7 @@ export default function AdminProducts() {
       isNewArrival: product.isNewArrival,
       isBestSeller: product.isBestSeller,
       isLimitedDrop: product.isLimitedDrop || Boolean(product.isDrop),
-      isCore: Boolean(product.isCore ?? String(product.collection || '').toLowerCase() === 'core'),
+      isCore: Boolean(product.isCore),
       coreLabel: product.coreLabel || 'Core Essential',
       corePriority: Number(product.corePriority || 0),
       isPromotion: Boolean(product.isPromotion),
@@ -271,7 +273,9 @@ export default function AdminProducts() {
       .filter(([, stock]) => Number(stock) >= 0)
       .map(([size, stock]) => ({ size, stock: Number(stock), lowStockThreshold: 3 }));
 
-    const category = draft.category === 'custom' || draft.category === 'all' ? 'unisex' : draft.category;
+    const targetAudience = draft.category === 'custom' ? 'unisex' : draft.category;
+    const category = targetAudience === 'all' ? 'unisex' : targetAudience;
+    const normalizedCollection = draft.collection.trim() || (draft.isCore ? 'core' : draft.isDrop || draft.isLimitedDrop ? 'limited' : 'seasonal');
     const customTags = draft.tags.split(',').map((v) => v.trim()).filter(Boolean);
     const payload = {
       name: draft.name.trim(),
@@ -282,8 +286,8 @@ export default function AdminProducts() {
       compareAtPrice: draft.compareAtPrice ? Number(draft.compareAtPrice) : undefined,
       category,
       gender: category,
-      targetAudience: draft.category === 'custom' ? 'unisex' : draft.category,
-      collection: draft.category === 'custom' && draft.customCategory ? draft.customCategory : draft.collection || (draft.isCore ? 'core' : 'seasonal'),
+      targetAudience,
+      collection: draft.category === 'custom' && draft.customCategory ? draft.customCategory : normalizedCollection,
       images: imageList,
       thumbnail: imageList[0],
       sizes: sizeRows,
@@ -308,7 +312,7 @@ export default function AdminProducts() {
       dropStartAt: draft.dropStartAt || undefined,
       dropEndAt: draft.dropEndAt || undefined,
       dropPriority: Number(draft.dropPriority || 0),
-      showInAnnouncementBar: draft.showInAnnouncementBar || draft.isPromotion || draft.isDrop,
+      showInAnnouncementBar: draft.showInAnnouncementBar,
       announcementText: (draft.announcementText || draft.promotionText || draft.dropLabel).trim(),
       marketingPriority: Number(draft.marketingPriority || draft.promotionPriority || draft.dropPriority || draft.corePriority || 0),
       status: draft.status,
@@ -369,7 +373,7 @@ export default function AdminProducts() {
           <div className="grid gap-3 md:grid-cols-[1fr_180px_180px]">
             <input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search by product name, slug, or SKU" className="studio-input" />
             <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="studio-input">
-              <option value="">All statuses</option>
+              <option value="">All active statuses</option>
               <option value="active">Active</option>
               <option value="draft">Draft</option>
               <option value="sold_out">Sold out</option>
@@ -402,7 +406,7 @@ export default function AdminProducts() {
                     <td className="p-4 text-xs text-[#BCAEA0]">{product.sku}</td>
                     <td className="p-4 text-xs font-semibold text-[#D2B48C]">{formatPrice(product.price)}</td>
                     <td className="p-4 text-xs text-[#BCAEA0]">{totalStock} units{product.sizes.some((size) => size.stock <= size.lowStockThreshold) && <p className="mt-1 text-[10px] text-amber-300">Low stock size</p>}</td>
-                    <td className="p-4 text-xs text-[#BCAEA0]"><span className="font-semibold text-[#FFF0E1]">{product.targetAudience || product.category}</span><div className="mt-2 flex flex-wrap gap-1">{product.isCore && <span className="rounded-full border border-[#D2B48C]/30 px-2 py-0.5 text-[9px] text-[#D2B48C]">Core</span>}{product.isPromotion && <span className="rounded-full border border-emerald-300/30 px-2 py-0.5 text-[9px] text-emerald-200">Promo</span>}{(product.isDrop || product.isLimitedDrop) && <span className="rounded-full border border-amber-300/30 px-2 py-0.5 text-[9px] text-amber-200">Drop</span>}{product.showInAnnouncementBar && <span className="rounded-full border border-sky-300/30 px-2 py-0.5 text-[9px] text-sky-200">Bar</span>}</div></td>
+                    <td className="p-4 text-xs text-[#BCAEA0]"><span className="font-semibold text-[#FFF0E1]">{product.targetAudience || product.category}</span>{getCollectionDisplayLabel(product) && <span className="ml-2 rounded-full border border-[#D2B48C]/30 px-2 py-0.5 text-[9px] text-[#D2B48C]">{getCollectionDisplayLabel(product)}</span>}<div className="mt-2 flex flex-wrap gap-1">{product.isPromotion && <span className="rounded-full border border-emerald-300/30 px-2 py-0.5 text-[9px] text-emerald-200">Promo</span>}{(product.isDrop || product.isLimitedDrop) && <span className="rounded-full border border-amber-300/30 px-2 py-0.5 text-[9px] text-amber-200">Drop</span>}{product.showInAnnouncementBar && <span className="rounded-full border border-sky-300/30 px-2 py-0.5 text-[9px] text-sky-200">Bar</span>}</div></td>
                     <td className="p-4"><div className="flex gap-2"><button onClick={() => openEdit(product)} className="text-[#BCAEA0] hover:text-[#D2B48C]"><Edit className="h-4 w-4" /></button><Link to={`/nexora-admin/reviews?productId=${product.id}`} className="text-[#BCAEA0] hover:text-[#D2B48C]" title="Manage product reviews"><StarIcon className="h-4 w-4" /></Link><button onClick={() => handleDelete(product.id)} className="text-[#BCAEA0] hover:text-red-300"><Trash2 className="h-4 w-4" /></button></div></td>
                   </tr>;
                 })}
@@ -550,7 +554,7 @@ export default function AdminProducts() {
                 <input value={draft.promotionText} onChange={(e) => updateDraft('promotionText', e.target.value)} className="studio-input" placeholder="Limited pieces available now — preview on delivery." />
               </Field>
               <label className="mt-4 flex items-start gap-3 text-sm font-semibold text-[#FFF0E1]">
-                <input type="checkbox" checked={draft.showInAnnouncementBar || draft.isPromotion || draft.isDrop} onChange={(e) => updateDraft('showInAnnouncementBar', e.target.checked)} className="mt-1" />
+                <input type="checkbox" checked={draft.showInAnnouncementBar} onChange={(e) => updateDraft('showInAnnouncementBar', e.target.checked)} className="mt-1" />
                 <span>Show this product in the animated site bar<span className="mt-1 block text-xs font-normal leading-5 text-[#BCAEA0]">Only active selected products appear in the moving storefront bar. No separate Promotions page is required.</span></span>
               </label>
               <div className="mt-4 grid gap-4 lg:grid-cols-[1fr_160px]">

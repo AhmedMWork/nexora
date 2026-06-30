@@ -1368,3 +1368,141 @@ html.dark .v34-logo-img { filter: brightness(1.14) contrast(1.08) drop-shadow(0 
     color: #806A5A !important;
   }
 }
+
+/* NEXORA — Product visibility and readability stability pass */
+@layer components {
+  .nexora-pdp-details {
+    border: 1px solid color-mix(in srgb, var(--v33-border) 92%, transparent);
+    border-radius: 28px;
+    background:
+      linear-gradient(145deg, color-mix(in srgb, var(--v33-card) 96%, transparent), color-mix(in srgb, var(--v33-card-muted) 76%, transparent));
+    padding: clamp(1rem, 2vw, 1.35rem);
+    box-shadow: 0 20px 55px color-mix(in srgb, var(--v33-shadow) 52%, transparent);
+    color: var(--v33-text);
+  }
+
+  .nexora-pdp-details-kicker {
+    color: #7D4A39;
+    font-size: .66rem;
+    font-weight: 950;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+  }
+
+  html.dark .nexora-pdp-details-kicker { color: var(--v33-accent-strong); }
+
+  .nexora-pdp-details-title {
+    margin-top: .35rem;
+    color: var(--v33-text);
+    font-size: clamp(.98rem, 2vw, 1.15rem);
+    font-weight: 850;
+    letter-spacing: -.025em;
+  }
+
+  .nexora-pdp-summary {
+    margin-top: .85rem;
+    color: #3E2A22;
+    font-size: .93rem;
+    font-weight: 560;
+    line-height: 1.85;
+  }
+
+  html.dark .nexora-pdp-summary { color: #F0E3D6; }
+
+  .nexora-pdp-mini-pill {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid color-mix(in srgb, var(--v33-accent) 58%, transparent);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--v33-accent) 13%, transparent);
+    color: #5D3327;
+    padding: .45rem .72rem;
+    font-size: .62rem;
+    font-weight: 950;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+  }
+
+  html.dark .nexora-pdp-mini-pill { color: var(--v33-accent); }
+
+  .nexora-pdp-info-card {
+    border: 1px solid color-mix(in srgb, var(--v33-border) 88%, transparent);
+    border-radius: 20px;
+    background: color-mix(in srgb, var(--v33-card) 92%, transparent);
+    padding: .9rem;
+  }
+
+  .nexora-pdp-preview-card {
+    background: linear-gradient(145deg, color-mix(in srgb, var(--v33-accent) 11%, var(--v33-card)), color-mix(in srgb, var(--v33-card) 92%, transparent));
+  }
+
+  .nexora-pdp-info-title {
+    display: flex;
+    align-items: center;
+    gap: .45rem;
+    color: #2B1B16;
+    font-size: .66rem;
+    font-weight: 950;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+  }
+
+  .nexora-pdp-info-title svg { color: #7D4A39; }
+  html.dark .nexora-pdp-info-title { color: #FFF4E8; }
+  html.dark .nexora-pdp-info-title svg { color: var(--v33-accent-strong); }
+
+  .nexora-pdp-info-copy {
+    margin-top: .6rem;
+    color: #5F4438;
+    font-size: .78rem;
+    font-weight: 560;
+    line-height: 1.75;
+  }
+
+  html.dark .nexora-pdp-info-copy { color: #D8CABD; }
+
+  .nexora-limited-compact-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.25rem;
+    border: 1px solid color-mix(in srgb, var(--v33-border) 86%, transparent);
+    border-radius: 32px;
+    background: linear-gradient(145deg, color-mix(in srgb, var(--v33-card) 96%, transparent), color-mix(in srgb, var(--v33-card-muted) 72%, transparent));
+    padding: clamp(1.15rem, 3vw, 2rem);
+    box-shadow: 0 24px 70px color-mix(in srgb, var(--v33-shadow) 56%, transparent);
+  }
+
+  @media (min-width: 1024px) {
+    .nexora-limited-compact-head {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .nexora-pdp-summary { font-size: .86rem; line-height: 1.78; }
+    .nexora-pdp-info-copy { font-size: .74rem; }
+    .nexora-limited-compact-head { border-radius: 24px; }
+  }
+
+  html.light [class*="text-[#d8cec2]"],
+  html.light [class*="text-[#8a8175]"],
+  html.light [class*="text-[#6f675d]"] {
+    color: #5F4438 !important;
+  }
+
+  html.light [class*="text-[#b8b0a3]"] {
+    color: #4E392F !important;
+  }
+
+  html.light [class*="text-[#c8a96a]"] {
+    color: #7D4A39 !important;
+  }
+
+  .nexora-admin-light .studio-help,
+  .admin-ux-reset .studio-help,
+  .nexora-admin-light td,
+  .admin-ux-reset td {
+    color: #4E392F !important;
+  }
+}

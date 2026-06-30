@@ -13,6 +13,7 @@ import type { Product } from '@/types';
 import { loadProducts } from '@/services/productService';
 import { PRODUCT_CATEGORIES, PRODUCT_SIZES, PRODUCT_COLORS, SORT_OPTIONS, PRICE_RANGES } from '@/lib/constants';
 import { normalizeColor } from '@/lib/productOptions';
+import { productMatchesAudience } from '@/lib/productVisibility';
 
 export default function ShopPage() {
   const { category } = useParams<{ category?: string }>();
@@ -61,28 +62,11 @@ export default function ShopPage() {
   const filteredProducts = useMemo(() => {
     let result = [...products];
 
-// Collection / audience filter
-if (selectedCollection) {
-  result = result.filter((product) => {
-    const audience = String(
-      product.targetAudience || product.gender || product.category || ''
-    ).toLowerCase();
-
-    if (selectedCollection === 'men') {
-      return audience === 'men' || audience === 'unisex' || audience === 'all';
+    // Audience / collection filter. Men and Women intentionally include Unisex/All pieces,
+    // so a single product can appear in both without duplicate stock.
+    if (selectedCollection) {
+      result = result.filter((product) => productMatchesAudience(product, selectedCollection));
     }
-
-    if (selectedCollection === 'women') {
-      return audience === 'women' || audience === 'unisex' || audience === 'all';
-    }
-
-    if (selectedCollection === 'unisex') {
-      return audience === 'unisex' || audience === 'all';
-    }
-
-    return product.category === selectedCollection || audience === selectedCollection;
-  });
-}
 
     // Search
     if (searchQuery) {

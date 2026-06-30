@@ -1,17 +1,12 @@
-// ============================================================
-// NEXORA V3.4 — Limited Releases Page
-// Limited is not a permanent shelf: only live drops are shoppable here.
-// ============================================================
-
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { ArrowRight, Hourglass, Sparkles, Timer } from 'lucide-react';
-import SectionReveal from '@/components/ui/SectionReveal';
 import ProductCard from '@/components/ui/ProductCard';
 import { loadProducts } from '@/services/productService';
 import { getDrops } from '@/services/drop.service';
+import { isProductLiveDrop } from '@/lib/productVisibility';
 import type { Drop, Product } from '@/types';
 
 function toMillis(value: unknown, fallback: number) {
@@ -32,15 +27,6 @@ function isDropLive(drop: Drop) {
   return now >= start && now <= end;
 }
 
-function isProductDropLive(product: Product) {
-  if (product.status && !['active', 'sold_out'].includes(product.status)) return false;
-  if (!(product.isDrop || product.isLimitedDrop)) return false;
-  const now = Date.now();
-  const start = toMillis(product.dropStartAt, 0);
-  const end = toMillis(product.dropEndAt, Infinity);
-  return now >= start && now <= end;
-}
-
 export default function DropsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [liveDrops, setLiveDrops] = useState<Drop[]>([]);
@@ -57,10 +43,10 @@ export default function DropsPage() {
         const scheduled = drops.filter((d) => d.status === 'scheduled');
         const liveDropIds = new Set(live.map((d) => d.id));
         const liveProductIds = new Set(live.flatMap((d) => d.productIds || []));
-        const filtered = items.filter((p) => {
-          if (isProductDropLive(p)) return true;
+        const filtered = items.filter((product) => {
+          if (isProductLiveDrop(product)) return true;
           if (live.length === 0) return false;
-          return Boolean((p.dropId && liveDropIds.has(p.dropId)) || liveProductIds.has(p.id) || liveProductIds.has(p.slug));
+          return Boolean((product.dropId && liveDropIds.has(product.dropId)) || liveProductIds.has(product.id) || liveProductIds.has(product.slug));
         });
         setLiveDrops(live);
         setScheduledDrops(scheduled);
@@ -77,71 +63,46 @@ export default function DropsPage() {
     return () => { mounted = false; };
   }, []);
 
-  const currentDrop = liveDrops[0];
-  const featured = products[0];
   const totalPieces = useMemo(() => products.reduce((sum, product) => sum + product.sizes.reduce((sizeSum, size) => sizeSum + Math.max(0, size.stock), 0), 0), [products]);
+  const hasLiveLimited = products.length > 0;
 
   return (
     <>
       <Helmet>
         <title>Limited Releases | NEXORA</title>
-        <meta name="description" content="NEXORA limited releases are available only during selected windows. When a release ends, it leaves the main store." />
+        <meta name="description" content="Shop NEXORA limited pieces marked directly from Products HQ. Active product-led drops appear without a large empty intro." />
       </Helmet>
 
       <main className="pt-24 pb-20 v3-page min-h-screen overflow-hidden">
         <section className="v3-shell">
-          <div className="grid lg:grid-cols-[1fr_0.85fr] gap-8 lg:gap-12 items-center min-h-[58vh]">
-            <SectionReveal>
-              <div className="flex flex-wrap items-center gap-3 mb-5">
+          <div className="nexora-limited-compact-head">
+            <div className="min-w-0">
+              <div className="mb-4 flex flex-wrap items-center gap-2">
                 <span className="v33-limited-pill"><Sparkles className="h-3.5 w-3.5" /> Limited</span>
-                <span className="v3-kicker">Selected windows only</span>
+                <span className="v3-kicker">Product-led drops</span>
               </div>
-              <h1 className="v3-title max-w-3xl">Limited releases, never permanent.</h1>
-              <p className="v3-lead mt-6">NEXORA limited pieces now live directly on products. Mark any product as a Drop in Products HQ and it appears here during its selected window.</p>
-              <div className="mt-8 flex flex-col sm:flex-row gap-3">
-                <Link to="/shop" className="v3-btn-primary">Shop Core Essentials <ArrowRight className="h-4 w-4" /></Link>
-                <Link to="/shop/unisex" className="v3-btn-secondary">Explore Unisex</Link>
-              </div>
-            </SectionReveal>
-
-            <SectionReveal delay={0.12}>
-              <div className="v33-limited-hero-card">
-                {featured && currentDrop ? (
-                  <>
-                    <img src={featured.images[0]} alt={featured.name} className="absolute inset-0 h-full w-full object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#171210]/86 via-[#171210]/24 to-transparent dark:from-[#0E0B0A]/92" />
-                    <div className="relative z-10 mt-auto p-6 sm:p-8">
-                      <p className="text-[10px] uppercase tracking-[0.28em] text-[#FFFDF8]/80">Live limited release</p>
-                      <h2 className="mt-3 text-3xl font-semibold tracking-[-0.05em] text-[#FFFDF8]">{currentDrop.name}</h2>
-                      <p className="mt-3 max-w-md text-sm leading-7 text-[#F4E8DA]/80">{currentDrop.description}</p>
-                      <Link to={`/product/${featured.slug}`} className="mt-5 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-[#D2B48C]">View piece <ArrowRight className="h-3.5 w-3.5" /></Link>
-                    </div>
-                  </>
-                ) : (
-                  <div className="relative z-10 flex h-full flex-col items-center justify-center p-8 text-center">
-                    <Hourglass className="h-10 w-10 text-[var(--v33-accent)]" />
-                    <h2 className="mt-5 text-2xl font-semibold text-[var(--v33-text)]">No limited release is live right now.</h2>
-                    <p className="mt-3 max-w-sm text-sm leading-7 text-[var(--v33-muted)]">Limited pieces are released in selected windows only. Core essentials remain available in the shop.</p>
-                    <Link to="/shop" className="v3-btn-secondary mt-6">Shop core essentials</Link>
-                  </div>
-                )}
-              </div>
-            </SectionReveal>
+              <h1 className="text-[clamp(2rem,5vw,4.6rem)] font-semibold leading-[0.95] tracking-[-0.055em] text-[var(--v33-text)]">
+                {hasLiveLimited ? 'Limited pieces live now.' : 'No limited pieces are live right now.'}
+              </h1>
+              <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--v33-muted)]">
+                Products marked as Drop or Limited inside Products HQ appear here automatically during their selected window. No separate Drops page setup is needed.
+              </p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-3 lg:min-w-[520px]">
+              <div className="v33-stat-card"><Timer className="h-4 w-4" /><span>Limited status</span><strong>{hasLiveLimited ? 'Live now' : 'Closed'}</strong></div>
+              <div className="v33-stat-card"><Sparkles className="h-4 w-4" /><span>Live pieces</span><strong>{products.length}</strong></div>
+              <div className="v33-stat-card"><Hourglass className="h-4 w-4" /><span>Available stock</span><strong>{totalPieces}</strong></div>
+            </div>
           </div>
         </section>
 
-        <section className="v3-shell mt-14 lg:mt-20">
-          <div className="grid sm:grid-cols-3 gap-3 mb-10">
-            <div className="v33-stat-card"><Timer className="h-4 w-4" /><span>Limited status</span><strong>{currentDrop ? 'Live now' : 'Closed'}</strong></div>
-            <div className="v33-stat-card"><Sparkles className="h-4 w-4" /><span>Live pieces</span><strong>{products.length}</strong></div>
-            <div className="v33-stat-card"><Hourglass className="h-4 w-4" /><span>Available stock</span><strong>{totalPieces}</strong></div>
-          </div>
-
+        <section className="v3-shell mt-8 lg:mt-12">
           <div className="v3-section-head">
             <div>
               <p className="v3-kicker">Limited releases</p>
-              <h2>{currentDrop ? 'Available now' : 'Between releases'}</h2>
+              <h2>{hasLiveLimited ? 'Available now' : 'Between releases'}</h2>
             </div>
+            <Link to="/shop" className="v3-inline-link">Browse all <ArrowRight className="h-4 w-4" /></Link>
           </div>
 
           {isLoading ? (
@@ -155,7 +116,7 @@ export default function DropsPage() {
           ) : (
             <div className="v33-empty-panel">
               <p>No limited release is live right now.</p>
-              {scheduledDrops.length > 0 && <p className="mt-2 text-xs">A new limited window is scheduled soon.</p>}
+              {scheduledDrops.length > 0 || liveDrops.length > 0 ? <p className="mt-2 text-xs">A limited window is scheduled or being prepared.</p> : <p className="mt-2 text-xs">Mark any active product as Drop in Products HQ to show it here.</p>}
               <Link to="/shop" className="v3-btn-secondary mt-5">Shop core essentials</Link>
             </div>
           )}

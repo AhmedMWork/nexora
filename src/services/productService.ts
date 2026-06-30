@@ -1,6 +1,7 @@
 import type { Product } from '@/types';
 import { SEED_PRODUCTS } from '@/lib/seedData';
 import { getProductBySlug, getProducts as getSupabaseProducts } from '@/lib/supabase/db';
+import { productMatchesAudience } from '@/lib/productVisibility';
 
 const seedFallbackEnabled = import.meta.env.DEV || import.meta.env.VITE_ENABLE_SEED_FALLBACK === 'true';
 
@@ -13,18 +14,9 @@ export function seedProductsAsProducts(): Product[] {
   }));
 }
 
-function productMatchesCategory(product: Product, category?: string) {
-  if (!category) return true;
-  const audience = product.targetAudience || product.gender || product.category;
-  if (category === 'men') return audience === 'men' || audience === 'unisex' || audience === 'all';
-  if (category === 'women') return audience === 'women' || audience === 'unisex' || audience === 'all';
-  if (category === 'unisex') return audience === 'unisex' || audience === 'all';
-  return product.category === category || audience === category;
-}
-
 function applyLocalFilters(products: Product[], filters?: Parameters<typeof getSupabaseProducts>[0]): Product[] {
   return products.filter((product) => {
-    if (!productMatchesCategory(product, filters?.category)) return false;
+    if (!productMatchesAudience(product, filters?.category)) return false;
     if (filters?.isFeatured && !product.isFeatured) return false;
     if (filters?.isNewArrival && !product.isNewArrival) return false;
     if (filters?.isBestSeller && !product.isBestSeller) return false;

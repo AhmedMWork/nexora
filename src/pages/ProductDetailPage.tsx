@@ -41,6 +41,7 @@ import toast from 'react-hot-toast';
 import { trackEvent } from '@/services/analytics.service';
 import { trackWhatsAppClick } from '@/lib/analytics/tracker';
 import { getSizeDisplayLabel, getWeightRangeForSize, RETURN_EXCHANGE_POLICY_AR, SHIPPING_ESTIMATE_TEXT, SHIPPING_ESTIMATE_TEXT_AR } from '@/lib/sizeLabels';
+import { getCollectionDisplayLabel, getProductAudience } from '@/lib/productVisibility';
 
 export default function ProductDetailPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -257,6 +258,10 @@ export default function ProductDetailPage() {
       : `${liveSelectedStock} pieces available in ${selectedSizeLabel}.`
     : 'Select your size to check live stock.';
 
+  const audienceLabel = getProductAudience(product);
+  const collectionLabel = getCollectionDisplayLabel(product);
+  const productSummary = (product.shortDescription || product.description || '').trim() || 'Premium NEXORA piece with a relaxed, intentional silhouette and clean everyday finish.';
+
   const addSelectedToCart = () => {
     if (!selectedSize) {
       toast.error('Please select a size first');
@@ -433,7 +438,7 @@ export default function ProductDetailPage() {
 
             <div className="lg:col-span-3">
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-                <p className="text-[10px] tracking-[0.2em] uppercase text-[#c8a96a] mb-2">{product.category} — {product.collection}</p>
+                <p className="text-[10px] tracking-[0.2em] uppercase text-[#c8a96a] mb-2">{audienceLabel}{collectionLabel ? ` — ${collectionLabel}` : ''}</p>
                 <h1 className="text-2xl lg:text-3xl font-bold text-[#f4f0e8] mb-3">{product.name}</h1>
 
                 <div className="flex items-center gap-2 mb-5">
@@ -448,17 +453,23 @@ export default function ProductDetailPage() {
                   {product.compareAtPrice && <span className="text-lg text-[#8a8175] line-through">{formatPrice(product.compareAtPrice)}</span>}
                 </div>
 
-                <div className="mb-6 rounded-[26px] border border-[#202024] bg-[#0b0b0d]/72 p-4 sm:p-5">
-                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#c8a96a]">Product details before size</p>
-                  <p className="mt-3 text-sm leading-7 text-[#d8cec2]">{product.shortDescription || product.description}</p>
-                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                    <div className="rounded-2xl border border-[#17171a] bg-[#050505]/70 p-3">
-                      <p className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.16em] text-[#f4f0e8]"><Ruler className="h-3.5 w-3.5 text-[#c8a96a]" /> Fit</p>
-                      <p className="mt-2 text-xs leading-5 text-[#8a8175]">{product.fit || 'Structured relaxed fit with quiet presence.'}</p>
+                <div className="nexora-pdp-details mb-6">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <p className="nexora-pdp-details-kicker">About this piece</p>
+                      <h2 className="nexora-pdp-details-title">Read this before choosing size</h2>
                     </div>
-                    <div className="rounded-2xl border border-[#17171a] bg-[#050505]/70 p-3">
-                      <p className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.16em] text-[#f4f0e8]"><PackageCheck className="h-3.5 w-3.5 text-[#c8a96a]" /> Preview on delivery</p>
-                      <p className="mt-2 text-xs leading-5 text-[#8a8175]">You can inspect the piece while the courier is present. If the size is not right or you do not like it, return it immediately before the courier leaves.</p>
+                    {collectionLabel && <span className="nexora-pdp-mini-pill">{collectionLabel}</span>}
+                  </div>
+                  <p className="nexora-pdp-summary">{productSummary}</p>
+                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                    <div className="nexora-pdp-info-card">
+                      <p className="nexora-pdp-info-title"><Ruler className="h-3.5 w-3.5" /> Fit</p>
+                      <p className="nexora-pdp-info-copy">{product.fit || 'Relaxed premium fit with a clean streetwear silhouette.'}</p>
+                    </div>
+                    <div className="nexora-pdp-info-card nexora-pdp-preview-card">
+                      <p className="nexora-pdp-info-title"><PackageCheck className="h-3.5 w-3.5" /> Preview on delivery</p>
+                      <p className="nexora-pdp-info-copy">Preview the piece while the courier is present. If the size is not right or the item is not what you expected, return it immediately before the courier leaves.</p>
                     </div>
                   </div>
                 </div>

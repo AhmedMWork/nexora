@@ -9,19 +9,14 @@ import SectionReveal from '@/components/ui/SectionReveal';
 import { loadProducts } from '@/services/productService';
 import type { Product } from '@/types';
 import { formatPrice } from '@/lib/utils';
+import { getProductAudience, isProductLiveDrop } from '@/lib/productVisibility';
 
 export default function LimitedDropsSection() {
   const [drops, setDrops] = useState<Product[]>([]);
 
   useEffect(() => {
     loadProducts({ isLimitedDrop: true }).then((items) => {
-      const now = Date.now();
-      setDrops(items.filter((product) => {
-        if (!(product.isDrop || product.isLimitedDrop)) return false;
-        const start = product.dropStartAt ? new Date(product.dropStartAt).getTime() : 0;
-        const end = product.dropEndAt ? new Date(product.dropEndAt).getTime() : Infinity;
-        return now >= start && now <= end;
-      }).slice(0, 3));
+      setDrops(items.filter(isProductLiveDrop).slice(0, 3));
     });
   }, []);
 
@@ -52,7 +47,7 @@ export default function LimitedDropsSection() {
                     <img src={product.images[0]} alt={product.name} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="mb-2 flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-[var(--v33-muted)]"><Sparkles className="h-3 w-3 text-[var(--v33-accent-strong)]" /> Limited · {product.category}</p>
+                    <p className="mb-2 flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-[var(--v33-muted)]"><Sparkles className="h-3 w-3 text-[var(--v33-accent-strong)]" /> Limited · {getProductAudience(product)}</p>
                     <h3 className="truncate text-sm sm:text-base font-semibold text-[var(--v33-text)] group-hover:text-[var(--v33-accent-strong)] transition-colors">{product.name}</h3>
                     <p className="mt-1 text-xs font-bold text-[var(--v33-accent-strong)]">{formatPrice(product.price)}</p>
                   </div>

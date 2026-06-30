@@ -10,6 +10,7 @@ import { supabase, invokeStudioFunction, getStudioToken } from './client';
 import { DEFAULT_HOME_COLLECTION_TILES, normalizeHomeTiles, type HomeCollectionTile } from '@/content/homeTiles';
 import { DEFAULT_FOLLOWUP_TYPES, DEFAULT_ORDER_WORKFLOW_STATUSES, normalizeFollowupTypes, normalizeOrderWorkflow, type FollowupTypeConfig, type WorkflowStatus } from '@/lib/workflow';
 import { normalizeLaunchSettings, fromInputDateTime, launchVerificationSummary } from '@/lib/launchMode';
+import { normalizeAudienceValue } from '@/lib/productVisibility';
 import type {
   Product,
   ProductVariant,
@@ -42,8 +43,7 @@ function normalizeImages(row: Record<string, any>): string[] {
 }
 
 function normalizeAudience(row: Record<string, any>): Product['targetAudience'] {
-  const value = String(row.target_audience || row.targetAudience || row.gender || row.category || 'unisex').toLowerCase();
-  return ['men', 'women', 'unisex', 'all'].includes(value) ? value as Product['targetAudience'] : 'unisex';
+  return normalizeAudienceValue(row.target_audience || row.targetAudience || row.gender || row.category);
 }
 
 function rowToProduct(row: Record<string, any>): Product {
@@ -87,7 +87,7 @@ function rowToProduct(row: Record<string, any>): Product {
     isNewArrival: Boolean(row.new_arrival ?? row.is_new_arrival ?? row.isNewArrival),
     isBestSeller: Boolean(row.best_seller ?? row.is_best_seller ?? row.isBestSeller),
     isLimitedDrop: Boolean(row.is_limited ?? row.isLimitedDrop ?? row.is_drop ?? row.isDrop),
-    isCore: Boolean(row.is_core ?? row.isCore ?? String(row.collection || '').toLowerCase() === 'core'),
+    isCore: Boolean(row.is_core ?? row.isCore),
     coreLabel: row.core_label || row.coreLabel || '',
     corePriority: Number(row.core_priority ?? row.corePriority ?? 0),
     isPromotion: Boolean(row.is_promotion ?? row.isPromotion),
@@ -113,8 +113,8 @@ function rowToProduct(row: Record<string, any>): Product {
 }
 
 function productToRow(product: Partial<Product>): Record<string, any> {
-  const targetAudience = product.targetAudience || product.gender || product.category;
-  const storefrontCategory = targetAudience === 'men' || targetAudience === 'women' ? targetAudience : (product.category || 'unisex');
+  const targetAudience = normalizeAudienceValue(product.targetAudience || product.gender || product.category);
+  const storefrontCategory = targetAudience === 'men' || targetAudience === 'women' || targetAudience === 'unisex' ? targetAudience : (product.category || 'unisex');
   return {
     name_en: product.name,
     slug: product.slug,
@@ -460,9 +460,9 @@ export async function getProducts(filters?: { category?: string; isFeatured?: bo
         else if (category === 'unisex') q = q.in('target_audience', ['unisex', 'all']);
         else q = q.eq('target_audience', category);
       } else {
-        if (category === 'men') q = q.in('gender', ['men', 'unisex']);
-        else if (category === 'women') q = q.in('gender', ['women', 'unisex']);
-        else if (category === 'unisex') q = q.eq('gender', 'unisex');
+        if (category === 'men') q = q.in('gender', ['men', 'unisex', 'all']);
+        else if (category === 'women') q = q.in('gender', ['women', 'unisex', 'all']);
+        else if (category === 'unisex') q = q.in('gender', ['unisex', 'all']);
         else q = q.eq('gender', category);
       }
     }
