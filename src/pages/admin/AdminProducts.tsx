@@ -145,7 +145,7 @@ export default function AdminProducts() {
     const q = searchQuery.toLowerCase().trim();
     const matchesSearch = !q || p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q) || p.slug.toLowerCase().includes(q);
     const matchesStatus = statusFilter ? (p.status || 'active') === statusFilter : true;
-    const matchesCategory = categoryFilter ? p.category === categoryFilter : true;
+    const matchesCategory = categoryFilter ? ((audience) => categoryFilter === 'men' ? audience === 'men' || audience === 'unisex' || audience === 'all' : categoryFilter === 'women' ? audience === 'women' || audience === 'unisex' || audience === 'all' : categoryFilter === 'unisex' ? audience === 'unisex' || audience === 'all' : p.category === categoryFilter || audience === categoryFilter)(String(p.targetAudience || p.gender || p.category || '').toLowerCase()) : true;
     return matchesSearch && matchesStatus && matchesCategory;
   }), [products, searchQuery, statusFilter, categoryFilter]);
 
