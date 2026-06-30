@@ -9,6 +9,7 @@ import { useWishlistStore } from '@/stores/wishlistStore';
 import { useCartStore } from '@/stores/cartStore';
 import type { Product } from '@/types';
 import { formatPrice, calculateDiscount } from '@/lib/utils';
+import { getCollectionDisplayLabel, getProductAudience } from '@/lib/productVisibility';
 import toast from 'react-hot-toast';
 
 interface ProductCardProps {
@@ -28,6 +29,8 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
   const isLowStock = !isSoldOut && totalStock <= 5;
   const primaryImage = product.images[0] || product.thumbnail || '/assets/nexora-logo-bg.jpg';
   const secondaryImage = product.images.find((image) => image && image !== primaryImage);
+  const audienceLabel = getProductAudience(product);
+  const collectionLabel = getCollectionDisplayLabel(product);
 
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -77,7 +80,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
               : product.isBestSeller
                 ? 'Best Seller'
                 : product.isCore
-                  ? (product.coreLabel || 'Core')
+                  ? (collectionLabel || 'Core')
                   : null;
 
   return (
@@ -158,7 +161,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
 
         <div className="relative z-[2] p-4 sm:p-5">
           <p className="mb-2 text-[10px] uppercase tracking-[0.2em] text-[var(--v33-muted)]">
-            {product.targetAudience || product.category} · {product.isCore ? (product.coreLabel || 'Core') : product.collection}
+            {audienceLabel}{collectionLabel ? ` · ${collectionLabel}` : ''}
           </p>
           <h3 className="mb-3 line-clamp-1 text-sm font-bold text-[var(--v33-text)] transition-colors group-hover:text-[var(--v33-accent-strong)]">
             {product.name}
